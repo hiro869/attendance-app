@@ -37,14 +37,7 @@ class FortifyServiceProvider extends ServiceProvider
             }
         });
 
-        // ログイン後の遷移
-        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
-            public function toResponse($request)
-            {
-                return redirect('/attendance');
-            }
-        });
-
+        
         /*--------------------------------------------
         | ★ ログアウト後の遷移（これが今回の追加）
         ---------------------------------------------*/
@@ -55,6 +48,15 @@ class FortifyServiceProvider extends ServiceProvider
             }
         });
 
+        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
+            public function toResponse($request)
+            {
+            if (auth()->user()->role === 'admin') {
+                return redirect()->route('admin.attendance.list');
+            }
+                return redirect()->route('attendance.index');
+            }
+        });
 
         /*--------------------------------------------
         | ログイン画面（一般 / 管理者切り替え）

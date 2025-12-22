@@ -56,3 +56,23 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/login', function () {
         return view('admin.auth.login');
     })->name('admin.login');
+
+    // 管理者
+Route::get(
+    '/admin/attendance/list',
+    [\App\Http\Controllers\Admin\AttendanceController::class, 'index']
+)->name('admin.attendance.list');
+// スタッフ一覧
+Route::get(
+    '/admin/staff/list',
+    [\App\Http\Controllers\Admin\StaffController::class, 'index']
+)->name('admin.staff.list');
+
+// 申請一覧
+Route::get(
+    '/admin/request/list',
+    [\App\Http\Controllers\Admin\StampCorrectionRequestController::class, 'index']
+)->name('admin.request.list');
+
+
+

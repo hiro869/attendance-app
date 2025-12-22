@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,17 +14,17 @@
 <header class="header">
     <div class="header-inner">
 
-        {{-- 全画面共通ロゴ --}}
+        {{-- ▼ 全画面共通ロゴ --}}
         <a href="#">
             <img src="/images/logo.png" class="logo">
         </a>
 
-        {{-- ★ログイン画面以外でメニュー表示 --}}
+        {{-- ▼ログイン画面以外でメニュー表示 --}}
         @if(!Route::is('admin.login'))
             <nav class="admin-nav">
-                <a href="{{ route('admin.attendance.index') }}">勤怠一覧</a>
-                <a href="{{ route('admin.staff.index') }}">スタッフ一覧</a>
-                <a href="{{ route('admin.request.index') }}">申請一覧</a>
+                <a href="{{ route('admin.attendance.list') }}">勤怠一覧</a>
+                <a href="{{ route('admin.staff.list') }}">スタッフ一覧</a>
+                <a href="{{ route('admin.request.list') }}">申請一覧</a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -40,4 +41,5 @@
 </main>
 
 </body>
+
 </html>
