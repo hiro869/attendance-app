@@ -1,0 +1,86 @@
+/* 背景グレー（Figma通り） */
+body {
+    background: #EFEFF3;
+}
+
+/* 全体中央寄せ */
+.attendance-wrapper {
+    max-width: 760px;
+    margin: 40px auto;
+}
+
+/* タイトル */
+.page-title {
+    font-size: 26px;
+    font-weight: bold;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.title-bar {
+    display: inline-block;
+    width: 6px;
+    height: 26px;
+    background: black;
+    margin-right: 10px;
+}
+
+/* 月切り替え */
+.month-switch {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.switch-btn {
+    color: #888;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+/* 月表示 */
+.current-month {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.calendar-icon {
+    margin-right: 6px;
+}
+
+/* テーブル外枠（白い箱） */
+.table-box {
+    background: white;
+    border-radius: 10px;
+    padding: 10px 0;
+}
+
+/* テーブル */
+.attendance-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.attendance-table th {
+    padding: 12px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+.attendance-table td {
+    padding: 14px 0;
+    border-top: 1px solid #eee;
+    font-size: 15px;
+}
+
+/* 詳細リンク */
+.detail-link {
+    color: #007BFF;
+    text-decoration: none;
+}

@@ -16,6 +16,12 @@ class Attendance extends Model
         'end_time',
         'status',
     ];
+    protected $casts = [
+    'start_time' => 'datetime',
+    'end_time'   => 'datetime',
+    'work_date'  => 'date',
+];
+
 
     // ユーザー
     public function user()
@@ -26,7 +32,13 @@ class Attendance extends Model
     // 休憩履歴
     public function breaks()
     {
-        return $this->hasMany(BreakTime::class);
+        return $this->hasMany(BreakTime::class, 'attendance_id');
+    }
+    public function hasPendingRequest()
+    {
+        return $this->correctionRequests()
+            ->where('status', 0) // 0 = 承認待ち
+            ->exists();
     }
 
     // 修正申請

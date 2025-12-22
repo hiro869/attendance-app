@@ -1,0 +1,97 @@
+/* ===== ページ背景 ===== */
+.request-page {
+    background: #f5f5f5;
+    padding: 60px 20px;
+    min-height: calc(100vh - 70px);
+}
+
+/* ===== 中央 ===== */
+.request-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ===== タイトル ===== */
+.request-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.title-bar {
+    width: 4px;
+    height: 28px;
+    background: #000;
+    margin-right: 12px;
+}
+
+.request-title h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* ===== タブ ===== */
+.request-tabs {
+    display: flex;
+    gap: 40px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding-bottom: 12px;
+    font-size: 15px;
+    color: #666;
+    text-decoration: none;
+}
+
+.tab.active {
+    color: #111;
+    font-weight: 600;
+}
+
+/* ===== カード ===== */
+.request-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* ===== テーブル ===== */
+.request-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.request-table th {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.request-table td {
+    padding: 14px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.request-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== 詳細リンク ===== */
+.detail-link {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* ===== 空表示 ===== */
+.empty {
+    text-align: center;
+    color: #999;
+    padding: 30px 0;
+}

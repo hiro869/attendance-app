@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @push('page_css')
 <link rel="stylesheet" href="{{ asset('css/attendance/index.css') }}">
 @endpush
@@ -7,7 +6,6 @@
 @section('content')
 <div class="attendance-wrapper">
 
-    {{-- ステータス --}}
     <p class="status">
         @if (!$attendance)
             勤務外
@@ -20,13 +18,9 @@
         @endif
     </p>
 
-    {{-- 日付 --}}
     <p class="date">{{ \Carbon\Carbon::now()->isoFormat('YYYY年M月D日(ddd)') }}</p>
-
-    {{-- 時刻 --}}
     <p class="time">{{ \Carbon\Carbon::now()->format('H:i') }}</p>
 
-    {{-- ボタン --}}
     <form action="{{ route('attendance.store') }}" method="POST">
         @csrf
 
@@ -35,16 +29,16 @@
         @endif
 
         @if ($attendance && $attendance->status === 1)
-            <button name="action" value="end" class="btn-main">退勤</button>
             <button name="action" value="break_start" class="btn-sub">休憩入</button>
+            <button name="action" value="end" class="btn-main">退勤</button>
         @endif
 
         @if ($attendance && $attendance->status === 2)
-            <button name="action" value="break_end" class="btn-main">休憩戻</button>
+            <button name="action" value="break_end" class="btn-sub">休憩戻</button>
         @endif
 
         @if ($attendance && $attendance->status === 3)
-            <p class="finished">お疲れ様でした。</p>
+            <p>お疲れ様でした。</p>
         @endif
     </form>
 

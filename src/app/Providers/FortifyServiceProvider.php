@@ -7,11 +7,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\LoginResponse;
+use Laravel\Fortify\Contracts\LogoutResponse; // ★ 追加
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiting\Limit;
-use Laravel\Fortify\Contracts\LoginResponse;
-
+use Illuminate\Validation\ValidationException;
+use App\Http\Requests\LoginRequest;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -22,7 +24,9 @@ class FortifyServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // 会員登録処理
+        /*--------------------------------------------
+        |  会員登録
+        ---------------------------------------------*/
         Fortify::createUsersUsing(CreateNewUser::class);
 
         // 登録後の遷移
@@ -32,6 +36,8 @@ class FortifyServiceProvider extends ServiceProvider
                 return redirect('/attendance');
             }
         });
+
+        // ログイン後の遷移
         $this->app->instance(LoginResponse::class, new class implements LoginResponse {
             public function toResponse($request)
             {
@@ -39,30 +45,59 @@ class FortifyServiceProvider extends ServiceProvider
             }
         });
 
-
-        // ログイン画面
-        Fortify::loginView(function () {
-            return view('auth.login');
+        /*--------------------------------------------
+        | ★ ログアウト後の遷移（これが今回の追加）
+        ---------------------------------------------*/
+        $this->app->instance(LogoutResponse::class, new class implements LogoutResponse {
+            public function toResponse($request)
+            {
+                return redirect('/login');  // ← ログアウト後にログイン画面へ
+            }
         });
 
-        // 会員登録画面
+
+        /*--------------------------------------------
+        | ログイン画面（一般 / 管理者切り替え）
+        ---------------------------------------------*/
+        Fortify::loginView(function () {
+
+        // 管理者側URLなら管理者ログインビューを返す
+        if (request()->is('admin/*')) {
+            return view('admin.auth.login');
+        }
+
+        // それ以外は一般ログインビュー
+        return view('auth.login');
+        });
+
+        /*--------------------------------------------
+        | 会員登録画面
+        ---------------------------------------------*/
         Fortify::registerView(function () {
             return view('auth.register');
         });
 
-        // ログイン認証処理
-        Fortify::authenticateUsing(function ($request) {
 
-            $requestObj = new \App\Http\Requests\LoginRequest();
-            $request->validate(
-                $requestObj->rules(),
-                $requestObj->messages()
-            );
+        /*--------------------------------------------
+        | ログイン認証（日本語バリデーション）
+        ---------------------------------------------*/
+        Fortify::authenticateUsing(function (Request $request) {
 
-            $user = \App\Models\User::where('email', $request->email)->first();
+            $formRequest = new LoginRequest();
 
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
+            $formRequest->setContainer(app())
+                        ->setRedirector(app('redirect'));
+
+            $formRequest->merge($request->all());
+
+            $formRequest->validateResolved();
+
+            $validated = $formRequest->validated();
+
+            $user = \App\Models\User::where('email', $validated['email'])->first();
+
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
+                throw ValidationException::withMessages([
                     'email' => ['ログイン情報が登録されていません'],
                 ]);
             }
@@ -70,10 +105,12 @@ class FortifyServiceProvider extends ServiceProvider
             return $user;
         });
 
-        // ★ 追加：ログインレートリミット（これが無いとエラー）
+
+        /*--------------------------------------------
+        | レートリミット
+        ---------------------------------------------*/
         RateLimiter::for('login', function (Request $request) {
-            $email = (string) $request->email;
-            return Limit::perMinute(5)->by($email.$request->ip());
+            return Limit::perMinute(5)->by($request->email . $request->ip());
         });
     }
 }

@@ -1,3 +1,10 @@
+/* 全体余白削除 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Noto Sans JP", sans-serif;
+}
+
 /* ===== ヘッダー ===== */
 
 .header {
@@ -7,11 +14,11 @@
 }
 
 .header-inner {
-    max-width: 1200px;   /* 中央揃え用の最大幅 */
-    margin: 0 auto;      /* 真ん中に配置 */
-    padding: 0 24px;     /* 左右に余白 */
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
     display: flex;
-    justify-content: space-between; /* ← ロゴ左 / メニュー右 */
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -22,7 +29,7 @@
 .nav {
     display: flex;
     align-items: center;
-    gap: 32px;  /* メニュー間の余白 */
+    gap: 32px;
 }
 
 .nav a,
@@ -41,4 +48,11 @@
     border: none;
     color: #fff;
     cursor: pointer;
+}
+
+
+/* ===== メインエリア（全ページ共通） ===== */
+.main {
+    margin: 0;
+    padding: 0;   /* ★ ここが余白の正体 → 全部ゼロに */
 }

@@ -7,118 +7,182 @@ use App\Models\BreakTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\AttendanceCorrectionRequest;
+
 
 class AttendanceController extends Controller
 {
     /**
-     * 勤怠トップ（出勤/休憩/退勤 ボタン表示）
+     * 打刻画面
      */
     public function index()
     {
         $user = Auth::user();
         $today = Carbon::today()->toDateString();
 
-        // 今日の勤怠取得
         $attendance = Attendance::where('user_id', $user->id)
             ->where('work_date', $today)
             ->first();
 
-        return view('attendance.index', [
-            'attendance' => $attendance,
-            'now' => Carbon::now()->format('Y-m-d H:i:s'),
-        ]);
+        return view('attendance.index', compact('attendance'));
     }
 
     /**
-     * 打刻処理（出勤 / 休憩入 / 休憩戻 / 退勤）
+     * 打刻処理
      */
     public function store(Request $request)
     {
         $user = Auth::user();
         $today = Carbon::today()->toDateString();
-        $action = $request->input('action'); // "start" "break_start" "break_end" "end"
+        $action = $request->input('action');
 
-        // 今日の勤怠取得 or 作成
-        $attendance = Attendance::firstOrCreate(
-            ['user_id' => $user->id, 'work_date' => $today],
-            ['status' => 0]
-        );
+        // ★ 今日の勤怠は必ず1件だけ
+        $attendance = Attendance::where('user_id', $user->id)
+            ->where('work_date', $today)
+            ->first();
 
-        /*=====================
-            勤務外 → 出勤
-        =====================*/
+        if (!$attendance) {
+            $attendance = Attendance::create([
+                'user_id'   => $user->id,
+                'work_date'=> $today,
+                'status'   => 0,
+            ]);
+        }
+
+        // 出勤
         if ($action === 'start') {
-            if ($attendance->start_time) {
-                return back()->with('error', '出勤は1日に1回のみです');
-            }
+            if ($attendance->start_time) return back();
 
             $attendance->update([
-                'start_time' => Carbon::now(),
-                'status' => 1, // 出勤中
+                'start_time' => now(),
+                'status'     => 1,
             ]);
-
-            return back()->with('success', '出勤しました！');
+            return back();
         }
 
-        /*=====================
-            出勤中 → 休憩入
-        =====================*/
+        // 休憩開始
         if ($action === 'break_start') {
-            if ($attendance->status !== 1) {
-                return back()->with('error', '休憩に入れません');
+            if ($attendance->status !== 1) return back();
+
+            if (!$attendance->breaks()->whereNull('break_end')->exists()) {
+                $attendance->breaks()->create([
+                    'break_start' => now(),
+                ]);
+                $attendance->update(['status' => 2]);
             }
-
-            BreakTime::create([
-                'attendance_id' => $attendance->id,
-                'break_start' => Carbon::now(),
-            ]);
-
-            $attendance->update(['status' => 2]); // 休憩中
-
-            return back()->with('success', '休憩に入りました');
+            return back();
         }
 
-        /*=====================
-            休憩中 → 休憩戻
-        =====================*/
+        // 休憩終了
         if ($action === 'break_end') {
+            if ($attendance->status !== 2) return back();
 
-            if ($attendance->status !== 2) {
-                return back()->with('error', '休憩を終了できません');
+            $break = $attendance->breaks()->whereNull('break_end')->first();
+            if ($break) {
+                $break->update([
+                    'break_end' => now(),
+                ]);
             }
 
-            $break = BreakTime::where('attendance_id', $attendance->id)
-                ->whereNull('break_end')
-                ->latest()
-                ->first();
-
-            if (!$break) {
-                return back()->with('error', '終了できる休憩がありません');
-            }
-
-            $break->update(['break_end' => Carbon::now()]);
-
-            $attendance->update(['status' => 1]); // 再び出勤中
-
-            return back()->with('success', '休憩から戻りました');
+            $attendance->update(['status' => 1]);
+            return back();
         }
 
-        /*=====================
-            出勤中 → 退勤
-        =====================*/
+        // 退勤
         if ($action === 'end') {
-            if ($attendance->end_time) {
-                return back()->with('error', '退勤は1日に1回のみです');
-            }
+            if (!$attendance->start_time || $attendance->end_time) return back();
 
             $attendance->update([
-                'end_time' => Carbon::now(),
-                'status' => 3, // 退勤済み
+                'end_time' => now(),
+                'status'   => 3,
             ]);
-
-            return back()->with('success', 'お疲れ様でした！');
+            return back();
         }
 
-        return back()->with('error', '不正な操作です');
+        return back();
     }
+
+public function detail($id)
+{
+    $attendance = Attendance::with('breaks')->findOrFail($id);
+
+    // ★ 修正申請（承認待ち）を取得
+    $correctionRequest = AttendanceCorrectionRequest::where('attendance_id', $attendance->id)
+        ->where('status', 0) // 承認待ちのみ
+        ->latest()
+        ->first();
+
+    return view('attendance.detail', [
+        'attendance'        => $attendance,
+        'breaks'            => $attendance->breaks,
+        'correctionRequest' => $correctionRequest, // ★ 必ず渡す
+    ]);
+}
+
+ public function list(Request $request)
+{
+    $current = $request->month
+        ? Carbon::parse($request->month . '-01')
+        : Carbon::now()->startOfMonth();
+
+    $prev = $current->copy()->subMonth()->format('Y-m');
+    $next = $current->copy()->addMonth()->format('Y-m');
+    $week = ['日','月','火','水','木','金','土'];
+
+    $attendances = Attendance::with('breaks')
+        ->where('user_id', auth()->id())
+        ->whereBetween('work_date', [
+            $current->copy()->startOfMonth(),
+            $current->copy()->endOfMonth()
+        ])
+        ->orderBy('work_date')
+        ->get()
+        ->map(function ($att) use ($week) {
+
+            $w = Carbon::parse($att->work_date);
+            $date = $w->format('m/d') . '(' . $week[$w->dayOfWeek] . ')';
+
+            $start = $att->start_time?->format('H:i') ?? 'ー';
+            $end   = $att->end_time?->format('H:i') ?? 'ー';
+
+            // ===============================
+            // 休憩時間（秒）
+            // ===============================
+            $breakSec = 0;
+            foreach ($att->breaks as $b) {
+                if ($b->break_start && $b->break_end) {
+                    $breakSec += $b->break_start->diffInSeconds($b->break_end);
+                }
+            }
+
+            $breakHour = intdiv($breakSec, 3600);
+            $breakMin  = intdiv($breakSec % 3600, 60);
+            $break = sprintf('%d:%02d', $breakHour, $breakMin);
+
+            // ===============================
+            // 勤務時間（秒）
+            // ===============================
+            if ($att->start_time && $att->end_time) {
+                $workSec = $att->start_time->diffInSeconds($att->end_time) - $breakSec;
+                $workSec = max($workSec, 0);
+
+                $workHour = intdiv($workSec, 3600);
+                $workMin  = intdiv($workSec % 3600, 60);
+                $total = sprintf('%d:%02d', $workHour, $workMin);
+            } else {
+                $total = 'ー';
+            }
+
+            return [
+                'id'    => $att->id,
+                'date'  => $date,
+                'start' => $start,
+                'end'   => $end,
+                'break' => $break,
+                'total' => $total,
+            ];
+        });
+
+    return view('attendance.list', compact('attendances', 'current', 'prev', 'next'));
+}
 }
