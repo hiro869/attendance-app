@@ -7,22 +7,31 @@
 @section('content')
 <div class="attendance-wrapper">
 
+    {{-- タイトル --}}
     <h2 class="page-title">
         <span class="title-bar"></span>
         勤怠一覧
     </h2>
 
+    {{-- 月切り替え --}}
     <div class="month-switch">
-        <a href="{{ route('attendance.list', ['month' => $prev]) }}" class="switch-btn">← 前月</a>
+        <a href="{{ route('attendance.list', ['month' => $prev]) }}"
+           class="switch-btn">
+            ← 前月
+        </a>
 
         <div class="current-month">
             <span class="calendar-icon">📅</span>
             {{ $current->format('Y年n月') }}
         </div>
 
-        <a href="{{ route('attendance.list', ['month' => $next]) }}" class="switch-btn">翌月 →</a>
+        <a href="{{ route('attendance.list', ['month' => $next]) }}"
+           class="switch-btn">
+            翌月 →
+        </a>
     </div>
 
+    {{-- テーブル --}}
     <div class="table-box">
         <table class="attendance-table">
             <thead>
@@ -36,19 +45,24 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($attendances as $row)
-                    <tr>
-                        <td>{{ $row['date'] }}</td>
-                        <td>{{ $row['start'] }}</td>
-                        <td>{{ $row['end'] }}</td>
-                        <td>{{ $row['break'] }}</td>
-                        <td>{{ $row['total'] }}</td>
-                        <td>
-                            @if($row['id'])
-                                <a href="{{ route('attendance.detail', $row['id']) }}">詳細</a>
-                            @endif
-                        </td>
-                    </tr>
+                @foreach ($rows as $row)
+                <tr>
+                    <td>{{ $row['date'] }}</td>
+                    <td>{{ $row['start'] }}</td>
+                    <td>{{ $row['end'] }}</td>
+                    <td>{{ $row['break'] }}</td>
+                    <td>{{ $row['total'] }}</td>
+                    <td>
+                        @if($row['id'])
+                            <a class="detail-link"
+                               href="{{ route('attendance.detail', $row['id']) }}">
+                                詳細
+                            </a>
+                        @else
+                            詳細
+                        @endif
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>

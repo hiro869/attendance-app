@@ -48,7 +48,7 @@
                     <tr>
                         <td>{{ $tab === 'pending' ? '承認待ち' : '承認済み' }}</td>
                         <td>{{ $req->user->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($req->target_date)->format('Y/m/d') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($req->attendance->work_date)->format('Y/m/d') }}</td>
                         <td>{{ $req->note }}</td>
                         <td>
                             {{ $tab === 'pending'

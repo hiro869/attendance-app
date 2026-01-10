@@ -1,11 +1,11 @@
-/* ===== ページ全体（header の下） ===== */
+/* ===== ページ全体 ===== */
 .detail-page {
     background: #f5f5f5;
     padding: 60px 20px;
-    min-height: calc(100vh - 70px); /* header 高さ分 */
+    min-height: calc(100vh - 70px);
 }
 
-/* ===== 中央 ===== */
+/* ===== 中央寄せ ===== */
 .detail-wrapper {
     max-width: 900px;
     margin: 0 auto;
@@ -51,6 +51,7 @@
     color: #666;
     padding: 18px 0;
     border-bottom: 1px solid #eee;
+    vertical-align: middle;
 }
 
 .detail-table td {
@@ -59,13 +60,15 @@
     font-size: 16px;
 }
 
-/* ===== 時刻 ===== */
+/* ===== 時刻入力 ===== */
 .time-row {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
+/* ===== input ===== */
 input[type="time"],
 input[type="text"] {
     height: 36px;
@@ -73,6 +76,7 @@ input[type="text"] {
     font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 6px;
+    background: #fff;
 }
 
 /* ===== ボタン ===== */
@@ -91,9 +95,19 @@ input[type="text"] {
     cursor: pointer;
 }
 
-/* ===== 赤文字 ===== */
+.edit-btn:hover {
+    opacity: 0.85;
+}
+
+/* ===== エラーメッセージ ===== */
 .error-text {
-    margin-top: 30px;
     color: #e60000;
     font-size: 14px;
+    margin-left: 12px;
+}
+
+/* ===== 承認待ちメッセージ ===== */
+.error-text.right {
+    text-align: right;
+    margin-top: 30px;
 }

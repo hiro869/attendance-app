@@ -1,0 +1,90 @@
+/* =========================
+   管理者：スタッフ一覧
+========================= */
+
+.staff-page {
+    background: #f5f5f5;
+    min-height: calc(100vh - 80px);
+    padding: 40px 0;
+}
+
+/* 全体幅 */
+.staff-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ===== タイトル ===== */
+.staff-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.title-bar {
+    width: 4px;
+    height: 24px;
+    background-color: #000;
+    margin-right: 12px;
+}
+
+.staff-title h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* ===== テーブル外枠 ===== */
+.staff-table-wrapper {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* ===== テーブル ===== */
+.staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+/* ヘッダー */
+.staff-table thead th {
+    padding: 14px 16px;
+    text-align: left;
+    color: #666;
+    font-weight: normal;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* 行 */
+.staff-table tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.staff-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* セル */
+.staff-table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+/* メールアドレス */
+.staff-table td:nth-child(2) {
+    color: #555;
+}
+
+/* 詳細リンク */
+.staff-table a {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.staff-table a:hover {
+    text-decoration: underline;
+}

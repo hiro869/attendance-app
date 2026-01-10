@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\AdminLoginRequest;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -80,32 +81,53 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
 
-        /*--------------------------------------------
-        | ログイン認証（日本語バリデーション）
-        ---------------------------------------------*/
         Fortify::authenticateUsing(function (Request $request) {
 
-            $formRequest = new LoginRequest();
+    // =========================
+    // ① FormRequest を切り替える
+    // =========================
+    if ($request->is('admin/*')) {
+        $formRequest = new AdminLoginRequest();
+    } else {
+        $formRequest = new LoginRequest();
+    }
 
-            $formRequest->setContainer(app())
-                        ->setRedirector(app('redirect'));
+    $formRequest->setContainer(app())
+                ->setRedirector(app('redirect'));
 
-            $formRequest->merge($request->all());
+    $formRequest->merge($request->all());
+    $formRequest->validateResolved();
 
-            $formRequest->validateResolved();
+    $validated = $formRequest->validated();
 
-            $validated = $formRequest->validated();
+    // =========================
+    // ② ユーザー取得
+    // =========================
+    $user = \App\Models\User::where('email', $validated['email'])->first();
 
-            $user = \App\Models\User::where('email', $validated['email'])->first();
+    // =========================
+    // ③ 認証失敗（要件 FN016）
+    // =========================
+    if (
+        !$user ||
+        !Hash::check($validated['password'], $user->password)
+    ) {
+        throw ValidationException::withMessages([
+            'email' => ['ログイン情報が登録されていません'],
+        ]);
+    }
 
-            if (!$user || !Hash::check($validated['password'], $user->password)) {
-                throw ValidationException::withMessages([
-                    'email' => ['ログイン情報が登録されていません'],
-                ]);
-            }
+    // =========================
+    // ④ 管理者チェック（超重要）
+    // =========================
+    if ($request->is('admin/*') && $user->role !== 'admin') {
+        throw ValidationException::withMessages([
+            'email' => ['ログイン情報が登録されていません'],
+        ]);
+    }
 
-            return $user;
-        });
+    return $user;
+});
 
 
         /*--------------------------------------------

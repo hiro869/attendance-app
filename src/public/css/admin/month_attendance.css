@@ -1,45 +1,41 @@
-/* 背景 */
 body {
-    background: #f2f2f2;
+    background: #EFEFF3;
 }
 
-/* 全体 */
 .attendance-wrapper {
     max-width: 760px;
     margin: 40px auto;
 }
 
-/* タイトル */
 .page-title {
-    display: flex;
-    align-items: center;
     font-size: 26px;
     font-weight: bold;
     margin-bottom: 24px;
+    display: flex;
+    align-items: center;
 }
 
 .title-bar {
     width: 6px;
     height: 26px;
-    background: #000;
+    background: black;
     margin-right: 10px;
 }
 
-/* 月切り替え */
 .month-switch {
+    background: white;
+    padding: 16px 20px;
+    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #fff;
-    padding: 16px;
-    border-radius: 10px;
     margin-bottom: 24px;
 }
 
 .switch-btn {
+    color: #888;
     text-decoration: none;
-    color: #333;
-    font-weight: bold;
+    font-size: 15px;
 }
 
 .current-month {
@@ -47,41 +43,32 @@ body {
     font-weight: bold;
 }
 
-/* テーブル */
 .table-box {
-    background: #fff;
+    background: white;
     border-radius: 10px;
-    overflow: hidden;
+    padding: 8px 0;
 }
 
 .attendance-table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.attendance-table thead {
-    background: #fafafa;
-}
-
-.attendance-table th,
-.attendance-table td {
-    padding: 14px 12px;
     text-align: center;
-    border-bottom: 1px solid #e5e5e5;
-    font-size: 14px;
 }
 
 .attendance-table th {
-    font-weight: bold;
+    padding: 12px 0;
+    background: #f6f6f6;
+    font-size: 14px;
 }
 
-/* 詳細リンク */
+.attendance-table td {
+    padding: 14px 0;
+    border-top: 1px solid #eee;
+    font-size: 15px;
+}
+
 .detail-link {
-    color: #6a5acd;
+    color: #000;
     font-weight: bold;
     text-decoration: none;
-}
-
-.detail-link:hover {
-    text-decoration: underline;
 }

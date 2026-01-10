@@ -1,19 +1,45 @@
 @extends('layouts.admin')
+@push('page_css')
+<link rel="stylesheet" href="{{ asset('css/admin/login.css') }}">
+@endpush
 
 @section('content')
+<div class="admin-login">
 
-<div class="login-wrapper">
+    <h1 class="admin-login-title">管理者ログイン</h1>
 
-    <h2 class="title">管理者ログイン</h2>
-
-    <form action="{{ route('login') }}" method="POST" class="login-form">
+    <form method="POST" action="{{ route('login') }}" class="admin-login-form">
         @csrf
 
-        <label>メールアドレス</label>
-        <input type="email" name="email">
+        {{-- メールアドレス --}}
+        <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+            >
 
-        <label>パスワード</label>
-        <input type="password" name="password">
+
+        @error('email')
+                <p class="error">{{ $message }}</p>
+            @enderror
+        </div>
+
+        {{-- パスワード --}}
+        <div class="form-group">
+            <label for="password">パスワード</label>
+            <input
+                id="password"
+                type="password"
+                name="password"
+            >
+
+            @error('password')
+                <p class="error">{{ $message }}</p>
+            @enderror
+        </div>
 
         <button type="submit" class="login-btn">
             管理者ログインする
@@ -21,5 +47,4 @@
     </form>
 
 </div>
-
 @endsection

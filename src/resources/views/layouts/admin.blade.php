@@ -21,7 +21,7 @@
 
         {{-- ▼ログイン画面以外でメニュー表示 --}}
         @if(!Route::is('admin.login'))
-            <nav class="admin-nav">
+            <nav class="nav">
                 <a href="{{ route('admin.attendance.list') }}">勤怠一覧</a>
                 <a href="{{ route('admin.staff.list') }}">スタッフ一覧</a>
                 <a href="{{ route('admin.request.list') }}">申請一覧</a>

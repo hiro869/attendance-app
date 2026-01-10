@@ -9,70 +9,51 @@ use App\Http\Request\AttendanceCorrectionRequestRequest;
 // use App\Http\Controllers\Admin\MonthAttendanceController;
 // use App\Http\Controllers\Admin\StampCorrectionRequestController as AdminStampCorrectionRequestController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// ロゴ（"/"）をクリックしたとき → 勤怠画面へ
-Route::get('/', function () {
-    return redirect()->route('attendance.index');
-});
-
-// ----------------------------------------
-// 一般ユーザー側（要件表の US007〜）
-// ----------------------------------------
+/* ======================
+| 🔹一般ユーザー
+====================== */
 Route::middleware('auth')->group(function () {
 
-    // 出勤登録画面（出勤・退勤・休憩）
-    // /attendance  GET: 画面表示  POST: 打刻処理
-    Route::get('/attendance', [AttendanceController::class, 'index'])
-        ->name('attendance.index');
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
+    Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
 
-    Route::post('/attendance', [AttendanceController::class, 'store'])
-        ->name('attendance.store');
+    Route::get('/attendance/list', [AttendanceController::class, 'index'])->name('attendance.list');
+    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])->name('attendance.detail');
 
-    // 勤怠一覧画面
-    // /attendance/list  GET
-    Route::get('/attendance/list', [AttendanceController::class, 'list'])
-        ->name('attendance.list');
+    Route::post('/attendance/{id}/request-correction',
+        [StampCorrectionRequestController::class, 'store']
+    )->name('attendance.requestCorrection');
 
-// 修正申請を先に書く！！（これは POST）
-   Route::post(
-    '/attendance/{id}/request-correction',
-    [StampCorrectionRequestController::class, 'store']
-)->name('attendance.requestCorrection');
+    Route::get('/stamp_correction_request/list',
+        [StampCorrectionRequestController::class, 'index']
+    )->name('request.index');
 
-// 詳細表示
-    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
-    ->name('attendance.detail');
-
-    
-    Route::get('/stamp_correction_request/list', [StampCorrectionRequestController::class, 'index'])
-        ->name('request.index');
 });
-// 管理者側
-    Route::get('/admin/login', function () {
-        return view('admin.auth.login');
-    })->name('admin.login');
 
-    // 管理者
-Route::get(
-    '/admin/attendance/list',
-    [\App\Http\Controllers\Admin\AttendanceController::class, 'index']
-)->name('admin.attendance.list');
-// スタッフ一覧
-Route::get(
-    '/admin/staff/list',
-    [\App\Http\Controllers\Admin\StaffController::class, 'index']
-)->name('admin.staff.list');
 
-// 申請一覧
-Route::get(
-    '/admin/request/list',
-    [\App\Http\Controllers\Admin\StampCorrectionRequestController::class, 'index']
-)->name('admin.request.list');
+/* ======================
+| 🔸管理者ユーザー
+====================== */
+Route::view('/admin/login', 'admin.auth.login')->name('admin.login');
+
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/attendance/list', [\App\Http\Controllers\Admin\AttendanceController::class,'index'])->name('attendance.list');
+    Route::get('/attendance/{id}', [\App\Http\Controllers\Admin\AttendanceController::class,'detail'])->name('attendance.detail');
+    Route::post('/attendance/{id}/update', [\App\Http\Controllers\Admin\AttendanceController::class, 'update'])->name('attendance.update');
+    Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/attendance/detail/{user}/{date}', [\App\Http\Controllers\Admin\AttendanceController::class, 'detailByDate'])->name('attendance.detail.byDate');
 
 
 
+
+    Route::get('/staff/list', [\App\Http\Controllers\Admin\StaffController::class,'index'])->name('staff.list');
+    Route::get('/attendance/staff/{id}', [\App\Http\Controllers\Admin\MonthAttendanceController::class,'index'])->name('staff.attendance');
+    Route::get('/attendance/staff/{id}/csv', [\App\Http\Controllers\Admin\MonthAttendanceController::class,'csv'])->name('staff.attendance.csv');
+
+    Route::get('/stamp_correction_request/list', [\App\Http\Controllers\Admin\StampCorrectionRequestController::class,'index'])->name('request.list');
+    Route::match(['get','post'],'/stamp_correction_request/approve/{attendance_correct_request_id}',
+        [\App\Http\Controllers\Admin\StampCorrectionRequestController::class,'approve']
+    )->name('request.approve');
+
+});
