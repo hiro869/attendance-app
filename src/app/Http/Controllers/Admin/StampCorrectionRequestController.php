@@ -7,7 +7,9 @@ use App\Models\Attendance;
 use App\Models\AttendanceCorrectionRequest;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
+use App\Models\AttendanceCorrectionApproval;
+
 
 class StampCorrectionRequestController extends Controller
 {
@@ -39,48 +41,64 @@ class StampCorrectionRequestController extends Controller
      * 申請詳細 / 承認
      */
 
+
+
 public function approve(Request $request, $id)
 {
     $correction = AttendanceCorrectionRequest::with(['attendance', 'user'])
         ->findOrFail($id);
 
-    // GET → 詳細表示
+    // GET：詳細表示
     if ($request->isMethod('get')) {
         return view('admin.request.approve', compact('correction'));
     }
 
-    // POST → 承認処理
-    DB::transaction(function () use ($correction) {
+    // POST：承認処理
+   DB::transaction(function () use ($correction) {
 
-        $attendance = $correction->attendance;
+    $attendance = $correction->attendance;
 
-        // ① 勤怠更新
-        $attendance->update([
-            'start_time' => $correction->request_start_time,
-            'end_time'   => $correction->request_end_time,
-            'note'       => $correction->note,
-        ]);
+    // ✅ 申請があった項目だけ更新する
+    $data = [];
 
-        // ② 休憩を更新
+    if ($correction->request_start_time) {
+        $data['start_time'] = $correction->request_start_time;
+    }
+
+    if ($correction->request_end_time) {
+        $data['end_time'] = $correction->request_end_time;
+    }
+
+    if (!empty($data)) {
+        $attendance->update($data);
+    }
+
+    // ✅ 休憩（申請があった場合のみ）
+    if (!empty($correction->request_breaks)) {
         $attendance->breaks()->delete();
 
-        if (!empty($correction->request_breaks)) {
-            foreach ($correction->request_breaks as $b) {
-                $attendance->breaks()->create([
-                    'break_start' => $b['start'],
-                    'break_end'   => $b['end'],
-                ]);
-            }
+        foreach ($correction->request_breaks as $b) {
+            $attendance->breaks()->create([
+                'break_start' => $b['start'],
+                'break_end'   => $b['end'],
+            ]);
         }
+    }
 
-        // ③ 申請を承認済みに
-        $correction->update([
-            'status' => 1,
-        ]);
+    // ✅ 申請を承認済みに
+    $correction->update(['status' => 1]);
+
+    // ✅ 承認履歴
+    AttendanceCorrectionApproval::create([
+        'correction_request_id' => $correction->id,
+        'admin_id' => auth()->id(),
+        'approved_at' => now(),
+    ]);
+
     });
 
     return redirect()
-        ->route('admin.request.list', ['tab' => 'approved'])
+        ->route('admin.request.list')
         ->with('success', '修正申請を承認しました');
 }
 }

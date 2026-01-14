@@ -36,23 +36,30 @@ public function store(AttendanceCorrectionRequestRequest $request, $id)
 {
     $attendance = Attendance::findOrFail($id);
 
+    $workDate = $attendance->work_date->format('Y-m-d');
+
     AttendanceCorrectionRequest::create([
         'attendance_id'      => $attendance->id,
         'user_id'            => auth()->id(),
+
         'request_start_time' => $request->start_time
-            ? $attendance->work_date . ' ' . $request->start_time
+            ? "{$workDate} {$request->start_time}"
             : null,
+
         'request_end_time'   => $request->end_time
-            ? $attendance->work_date . ' ' . $request->end_time
+            ? "{$workDate} {$request->end_time}"
             : null,
-        'request_breaks'     => $request->break_start && $request->break_end
+
+        // ★ ここが重要（datetime にする）
+        'request_breaks'     => ($request->break_start && $request->break_end)
             ? [[
-                'start' => $request->break_start,
-                'end'   => $request->break_end,
+                'start' => "{$workDate} {$request->break_start}",
+                'end'   => "{$workDate} {$request->break_end}",
             ]]
             : null,
+
         'note'               => $request->note,
-        'status'             => 0, // 承認待ち
+        'status'             => 0,
     ]);
 
     return redirect()

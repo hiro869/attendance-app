@@ -7,7 +7,6 @@
 @section('content')
 
 <div class="request-page">
-
     <div class="request-wrapper">
 
         {{-- タイトル --}}
@@ -36,7 +35,7 @@
                     <tr>
                         <th>状態</th>
                         <th>名前</th>
-                        <th>対象日時</th>
+                        <th>対象日</th>
                         <th>申請理由</th>
                         <th>{{ $tab === 'pending' ? '申請日時' : '承認日時' }}</th>
                         <th>詳細</th>
@@ -44,17 +43,30 @@
                 </thead>
 
                 <tbody>
-                @forelse($requests as $req)
+                @forelse ($requests as $req)
                     <tr>
-                        <td>{{ $tab === 'pending' ? '承認待ち' : '承認済み' }}</td>
+                        {{-- 状態 --}}
+                        <td>{{ $req->status === 0 ? '承認待ち' : '承認済み' }}</td>
+
+                        {{-- 名前 --}}
                         <td>{{ $req->user->name }}</td>
-                        <td>{{ \Carbon\Carbon::parse($req->attendance->work_date)->format('Y/m/d') }}</td>
-                        <td>{{ $req->note }}</td>
+
+                        {{-- 対象日 --}}
                         <td>
-                            {{ $tab === 'pending'
-                                ? $req->created_at->format('Y/m/d')
-                                : $req->approved_at->format('Y/m/d') }}
+                            {{ optional($req->attendance)->work_date?->format('Y/m/d') ?? '—' }}
                         </td>
+
+                        {{-- 申請理由 --}}
+                        <td>{{ $req->note }}</td>
+
+                        {{-- 申請日時 / 承認日時 --}}
+                        <td>
+                            {{ $req->status === 0
+                                ? $req->created_at->format('Y/m/d')
+                                : $req->updated_at->format('Y/m/d') }}
+                        </td>
+
+                        {{-- 詳細 --}}
                         <td>
                             <a class="detail-link"
                                href="{{ route('attendance.detail', $req->attendance_id) }}">
@@ -65,7 +77,9 @@
                 @empty
                     <tr>
                         <td colspan="6" class="empty">
-                            {{ $tab === 'pending' ? '承認待ちはありません' : '承認済みはありません' }}
+                            {{ $tab === 'pending'
+                                ? '承認待ちはありません'
+                                : '承認済みはありません' }}
                         </td>
                     </tr>
                 @endforelse

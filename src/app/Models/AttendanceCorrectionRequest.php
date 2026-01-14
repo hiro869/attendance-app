@@ -21,10 +21,13 @@ class AttendanceCorrectionRequest extends Model
         'note',
         'status',
     ];
+// app/Models/AttendanceCorrectionRequest.php
+protected $casts = [
+    'request_start_time' => 'datetime',
+    'request_end_time'   => 'datetime',
+    'request_breaks'     => 'array',
+];
 
-    protected $casts = [
-        'request_breaks' => 'array',
-    ];
 
     public function attendance()
     {
