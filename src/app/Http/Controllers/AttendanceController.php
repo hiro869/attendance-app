@@ -19,6 +19,14 @@ class AttendanceController extends Controller
 
 public function index(Request $request)
 {
+    if ($request->is('attendance')) {
+
+        $attendance = Attendance::where('user_id', auth()->id())
+            ->whereDate('work_date', Carbon::today())
+            ->first();
+
+        return view('attendance.index', compact('attendance'));
+    }
     $user = auth()->user();
 
     $current = $request->month

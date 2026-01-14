@@ -26,43 +26,44 @@
 
             {{-- ▼ ログイン後 --}}
             @auth
-                @php
-                    // 今日の勤怠情報
-                    $attendance = \App\Models\Attendance::where('user_id', auth()->id())
-                                ->where('work_date', \Carbon\Carbon::today()->toDateString())
-                                ->first();
+    @if (!request()->routeIs('verification.notice'))
 
-                    // status が null の場合は 0（勤務外）として扱う
-                    $status = $attendance->status ?? 0;
-                @endphp
+        @php
+            $attendance = \App\Models\Attendance::where('user_id', auth()->id())
+                        ->where('work_date', \Carbon\Carbon::today()->toDateString())
+                        ->first();
 
-                <nav class="nav">
+            $status = $attendance->status ?? 0;
+        @endphp
 
-                    {{-- ★① 出勤前（勤務外 0） --}}
-                    @if ($status === 0)
-                        <a href="{{ route('attendance.index') }}">勤怠</a>
-                        <a href="{{ route('attendance.list') }}">勤怠一覧</a>
-                        <a href="{{ route('request.index') }}">申請</a>
+        <nav class="nav">
 
-                    {{-- ★② 出勤中（1）・休憩中（2） --}}
-                    @elseif ($status === 1 || $status === 2)
-                        <a href="{{ route('attendance.index') }}">勤怠</a>
-                        <a href="{{ route('attendance.list') }}">勤怠一覧</a>
-                        <a href="{{ route('request.index') }}">申請</a>
+            {{-- ★① 出勤前 --}}
+            @if ($status === 0)
+                <a href="{{ url('/attendance') }}">勤怠</a>
+                <a href="{{ url('/attendance/list') }}">勤怠一覧</a>
+                <a href="{{ route('request.index') }}">申請</a>
 
-                    {{-- ★③ 退勤済（3） --}}
-                    @elseif ($status === 3)
-                        <a href="{{ route('attendance.list') }}">今月の出勤一覧</a>
-                        <a href="{{ route('request.index') }}">申請一覧</a>
-                    @endif
+            {{-- ★② 出勤中・休憩中 --}}
+            @elseif ($status === 1 || $status === 2)
+                <a href="{{ url('/attendance') }}">勤怠</a>
+                <a href="{{ url('/attendance/list') }}">勤怠一覧</a>
+                <a href="{{ route('request.index') }}">申請</a>
 
-                    {{-- ログアウト --}}
-                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                        @csrf
-                        <button type="submit">ログアウト</button>
-                    </form>
+            {{-- ★③ 退勤済 --}}
+            @elseif ($status === 3)
+                <a href="{{ url('/attendance/list') }}">今月の出勤一覧</a>
+                <a href="{{ route('request.index') }}">申請一覧</a>
+            @endif
 
-                </nav>
+            {{-- ログアウト --}}
+            <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                @csrf
+                <button type="submit">ログアウト</button>
+            </form>
+
+        </nav>
+    @endif
             @endauth
 
         </div>

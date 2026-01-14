@@ -1,0 +1,50 @@
+.verify-page {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.verify-wrapper {
+    text-align: center;
+}
+
+.verify-message {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.verify-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 220px;
+    height: 40px;
+    background: #d9d9d9;
+    border: 1px solid #999;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.verify-button:hover {
+    opacity: 0.9;
+}
+
+.resend-link {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.verify-note {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #666;
+}

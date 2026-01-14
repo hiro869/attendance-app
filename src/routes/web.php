@@ -12,13 +12,20 @@ use App\Http\Request\AttendanceCorrectionRequestRequest;
 /* ======================
 | 🔹一般ユーザー
 ====================== */
-Route::middleware('auth')->group(function () {
+Route::get('/email/verify', function () {return view('auth.verify-email');})->middleware('auth')->name('verification.notice');
+Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/attendance', [AttendanceController::class, 'store'])->name('attendance.store');
+    Route::get('/attendance', [AttendanceController::class, 'index'])
+        ->name('attendance.index');
 
-    Route::get('/attendance/list', [AttendanceController::class, 'index'])->name('attendance.list');
-    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])->name('attendance.detail');
+    Route::post('/attendance', [AttendanceController::class, 'store'])
+        ->name('attendance.store');
+
+    Route::get('/attendance/list', [AttendanceController::class, 'index'])
+        ->name('attendance.list');
+
+    Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
+        ->name('attendance.detail');
 
     Route::post('/attendance/{id}/request-correction',
         [StampCorrectionRequestController::class, 'store']
@@ -29,6 +36,8 @@ Route::middleware('auth')->group(function () {
     )->name('request.index');
 
 });
+
+
 
 
 /* ======================
