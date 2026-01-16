@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\StampCorrectionRequestController;
-use App\Http\Request\AttendanceCorrectionRequestRequest;
+use App\Http\Requests\AttendanceCorrectionRequestRequest;
 // use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 // use App\Http\Controllers\Admin\StaffController;
 // use App\Http\Controllers\Admin\MonthAttendanceController;
@@ -26,6 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/attendance/detail/{id}', [AttendanceController::class, 'detail'])
         ->name('attendance.detail');
+    Route::get('/attendance/detail/date/{date}', [AttendanceController::class, 'detailByDate'])->name('attendance.detail.byDate');
+
 
     Route::post('/attendance/{id}/request-correction',
         [StampCorrectionRequestController::class, 'store']
@@ -49,7 +51,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/attendance/list', [\App\Http\Controllers\Admin\AttendanceController::class,'index'])->name('attendance.list');
     Route::get('/attendance/{id}', [\App\Http\Controllers\Admin\AttendanceController::class,'detail'])->name('attendance.detail');
-    Route::post('/attendance/{id}/update', [\App\Http\Controllers\Admin\AttendanceController::class, 'update'])->name('attendance.update');
+    Route::put('/attendance/{id}', [\App\Http\Controllers\Admin\AttendanceController::class, 'update'])->name('attendance.update');
     Route::post('/attendance/store', [AttendanceController::class, 'store'])->name('attendance.store');
     Route::get('/attendance/detail/{user}/{date}', [\App\Http\Controllers\Admin\AttendanceController::class, 'detailByDate'])->name('attendance.detail.byDate');
 

@@ -22,7 +22,7 @@
 
         <div class="current-month">
             <span class="calendar-icon">📅</span>
-            {{ $current->format('Y年n月') }}
+            {{ $current->format('Y/m') }}
         </div>
 
         <a href="{{ route('attendance.list', ['month' => $next]) }}"
@@ -53,15 +53,9 @@
                     <td>{{ $row['break'] }}</td>
                     <td>{{ $row['total'] }}</td>
                     <td>
-                        @if($row['id'])
-                            <a class="detail-link"
-                               href="{{ route('attendance.detail', $row['id']) }}">
-                                詳細
-                            </a>
-                        @else
-                            詳細
-                        @endif
+                        <a class="detail-link" href="{{ route('attendance.detail.byDate', ['date' => $row['raw_date']]) }}">詳細</a>
                     </td>
+
                 </tr>
                 @endforeach
             </tbody>

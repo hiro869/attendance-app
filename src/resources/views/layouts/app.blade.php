@@ -15,9 +15,7 @@
         <div class="header-inner">
 
             {{-- ロゴ --}}
-            <a href="/">
                 <img src="/images/logo.png" alt="logo" class="logo">
-            </a>
 
             {{-- ▼ ログイン前 --}}
             @guest

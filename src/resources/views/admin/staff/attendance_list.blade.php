@@ -15,27 +15,24 @@
 
     {{-- 月切り替え --}}
     <div class="month-switch">
-        <a
-            class="switch-btn"
-            href="{{ route('admin.staff.attendance', [
-                'id'    => $staff->id,
-                'month' => $prev
-            ]) }}"
-        >
+        <a class="switch-btn"
+           href="{{ route('admin.staff.attendance', [
+               'id'=>$staff->id,
+               'month'=>$prev
+           ]) }}">
             ← 前月
         </a>
 
         <div class="current-month">
+            <span class="calendar-icon">📅</span>
             {{ $current->format('Y/m') }}
         </div>
 
-        <a
-            class="switch-btn"
-            href="{{ route('admin.staff.attendance', [
-                'id'    => $staff->id,
-                'month' => $next
-            ]) }}"
-        >
+        <a class="switch-btn"
+           href="{{ route('admin.staff.attendance', [
+               'id'=>$staff->id,
+               'month'=>$next
+           ]) }}">
             翌月 →
         </a>
     </div>
@@ -53,34 +50,40 @@
                     <th>詳細</th>
                 </tr>
             </thead>
-
             <tbody>
                 @foreach ($rows as $row)
-                    <tr>
-                        <td>{{ $row['date'] }}</td>
-
-                        {{-- 空欄はスペースで見た目安定 --}}
-                        <td>{{ $row['start'] !== 'ー' ? $row['start'] : ' ' }}</td>
-                        <td>{{ $row['end']   !== 'ー' ? $row['end']   : ' ' }}</td>
-                        <td>{{ $row['break'] !== 'ー' ? $row['break'] : ' ' }}</td>
-                        <td>{{ $row['total'] !== 'ー' ? $row['total'] : ' ' }}</td>
-
-                        {{-- 詳細：勤怠がない日も開ける --}}
-                        <td>
-                            <a
-                                class="detail-link"
-                                href="{{ route('admin.attendance.detail.byDate', [
-                                    'user' => $staff->id,
-                                    'date' => $row['raw_date']
-                                ]) }}"
-                            >
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ $row['date'] }}</td>
+                    <td>{{ $row['start'] !== 'ー' ? $row['start'] : ' ' }}</td>
+                    <td>{{ $row['end']   !== 'ー' ? $row['end']   : ' ' }}</td>
+                    <td>{{ $row['break'] !== 'ー' ? $row['break'] : ' ' }}</td>
+                    <td>{{ $row['total'] !== 'ー' ? $row['total'] : ' ' }}</td>
+                    <td>
+                        <a class="detail-link"
+                           href="{{ route('admin.attendance.detail.byDate', [
+                               'user'=>$staff->id,
+                               'date'=>$row['raw_date']
+                           ]) }}">
+                            詳細
+                        </a>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
+    </div>
+
+    {{-- ✅ CSV出力ボタン --}}
+    <div class="csv-wrapper">
+        <a
+            href="{{ route('admin.staff.attendance.csv', [
+                'id'    => $staff->id,
+                'month' => $current->format('Y-m')
+            ]) }}"
+            class="csv-button"
+        >
+            CSV出力
+        </a>
     </div>
 
 </div>

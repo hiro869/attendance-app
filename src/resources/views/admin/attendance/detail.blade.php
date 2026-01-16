@@ -29,12 +29,12 @@
                 $break = $hasAttendance ? $attendance->breaks->first() : null;
             @endphp
 
-            {{-- ▼ 勤怠がある & 承認待ちでない場合のみ form --}}
-            @if ($hasAttendance && !$hasRequest)
-                <form method="POST"
-                      action="{{ route('admin.attendance.update', $attendance->id) }}">
-                    @csrf
-            @endif
+          @if ($hasAttendance && !$hasRequest)
+   <form method="POST"
+      action="{{ url('/admin/attendance/'.$attendance->id) }}">
+    @csrf
+    @method('PUT')
+@endif
 
             <table class="detail-table">
 

@@ -32,11 +32,26 @@ class StampCorrectionRequestController extends Controller
     /**
      * 修正申請保存
      */
-public function store(AttendanceCorrectionRequestRequest $request, $id)
-{
+public function store(
+    AttendanceCorrectionRequestRequest $request,
+    $id
+) {
     $attendance = Attendance::findOrFail($id);
-
     $workDate = $attendance->work_date->format('Y-m-d');
+
+    // 休憩配列を datetime に変換
+    $requestBreaks = [];
+
+    foreach ($request->breaks ?? [] as $b) {
+        if (empty($b['start']) || empty($b['end'])) {
+            continue;
+        }
+
+        $requestBreaks[] = [
+            'start' => "{$workDate} {$b['start']}",
+            'end'   => "{$workDate} {$b['end']}",
+        ];
+    }
 
     AttendanceCorrectionRequest::create([
         'attendance_id'      => $attendance->id,
@@ -50,20 +65,15 @@ public function store(AttendanceCorrectionRequestRequest $request, $id)
             ? "{$workDate} {$request->end_time}"
             : null,
 
-        // ★ ここが重要（datetime にする）
-        'request_breaks'     => ($request->break_start && $request->break_end)
-            ? [[
-                'start' => "{$workDate} {$request->break_start}",
-                'end'   => "{$workDate} {$request->break_end}",
-            ]]
-            : null,
+        // ★ breaks 配列を保存
+        'request_breaks'     => $requestBreaks ?: null,
 
         'note'               => $request->note,
         'status'             => 0,
     ]);
 
     return redirect()
-        ->route('attendance.detail', $attendance->id)
+        ->route('attendance.detail.byDate', $attendance->work_date)
         ->with('success', '修正申請を送信しました');
 }
 }

@@ -8,100 +8,81 @@ use Carbon\Carbon;
 class AttendanceCorrectionRequestRequest extends FormRequest
 {
     public function authorize()
-    {
-        return true;
-    }
+{
+    return true;
+}
 
-    public function rules()
-    {
-        return [
-            'start_time'   => ['required', 'date_format:H:i'],
-            'end_time'     => ['required', 'date_format:H:i'],
-            'break_start'  => ['nullable', 'date_format:H:i'],
-            'break_end'    => ['nullable', 'date_format:H:i'],
-            'note'         => ['required'],
-        ];
-    }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function($validator){
+ public function rules()
+{
+    return [
+        'start_time' => ['required', 'date_format:H:i'],
+        'end_time'   => ['required', 'date_format:H:i'],
+        'note'       => ['required'],
 
-            $start = $this->start_time;
-            $end   = $this->end_time;
-            $bs    = $this->break_start;
-            $be    = $this->break_end;
+        // ★ 休憩（配列）
+        'breaks.*.start' => ['nullable', 'date_format:H:i'],
+        'breaks.*.end'   => ['nullable', 'date_format:H:i'],
+    ];
+}
 
-            // ===============================
-            // 出勤・退勤 チェック
-            // ===============================
-            if ($start && $end)
-            {
-                $s = Carbon::createFromFormat('H:i', $start);
-                $e = Carbon::createFromFormat('H:i', $end);
+public function withValidator($validator)
+{
+    $validator->after(function ($validator) {
 
-                if ($s->gte($e)) {
-                    $validator->errors()->add(
-                        'start_time',
-                        '出勤時間もしくは退勤時間が不適切な値です'
-                    );
-                }
+        $start = $this->start_time;
+        $end   = $this->end_time;
+
+        if (!$start || !$end) return;
+
+        $workStart = Carbon::createFromFormat('H:i', $start);
+        $workEnd   = Carbon::createFromFormat('H:i', $end);
+
+        // ① 出勤・退勤
+        if ($workStart->gte($workEnd)) {
+            $validator->errors()->add(
+                'start_time',
+                '出勤時間もしくは退勤時間が不適切な値です'
+            );
+        }
+
+        // ②③ 休憩チェック（配列）
+        foreach ($this->breaks ?? [] as $i => $b) {
+
+            if (empty($b['start']) || empty($b['end'])) {
+                continue;
             }
 
-            // ===============================
-            // 休憩開始チェック
-            // ===============================
-            if ($bs)
-            {
-                $s = Carbon::createFromFormat('H:i', $start);
-                $e = Carbon::createFromFormat('H:i', $end);
-                $b = Carbon::createFromFormat('H:i', $bs);
+            $bs = Carbon::createFromFormat('H:i', $b['start']);
+            $be = Carbon::createFromFormat('H:i', $b['end']);
 
-                // 出勤より前・退勤より後 → NG
-                if ($b->lte($s) || $b->gte($e)) {
-                    $validator->errors()->add(
-                        'break_start',
-                        '休憩時間が不適切な値です'
-                    );
-                }
+            // 休憩開始が出勤前 or 退勤後
+            if ($bs->lte($workStart) || $bs->gte($workEnd)) {
+                $validator->errors()->add(
+                    "breaks.$i.start",
+                    '休憩時間が不適切な値です'
+                );
             }
 
-            // ===============================
-            // 休憩終了チェック
-            // ===============================
-            if ($be)
-            {
-                $s       = Carbon::createFromFormat('H:i', $start);
-                $e       = Carbon::createFromFormat('H:i', $end);
-                $b_end   = Carbon::createFromFormat('H:i', $be);
-                $b_start = $bs ? Carbon::createFromFormat('H:i', $bs) : null;
-
-                // 退勤より後 → NG
-                if ($b_end->gte($e)) {
-                    $validator->errors()->add(
-                        'break_end',
-                        '休憩時間もしくは退勤時間が不適切な値です'
-                    );
-                }
-
-                // ★休憩終了 ≤ 休憩開始 → NG
-                if ($b_start && $b_end->lte($b_start)) {
-                    $validator->errors()->add(
-                        'break_end',
-                        '休憩時間が不適切な値です'
-                    );
-                }
-
-                // ★休憩終了 ≤ 出勤 → NG
-                if ($b_end->lte($s)) {
-                    $validator->errors()->add(
-                        'break_end',
-                        '休憩時間が不適切な値です'
-                    );
-                }
+            // 休憩終了が退勤後
+            if ($be->gte($workEnd)) {
+                $validator->errors()->add(
+                    "breaks.$i.end",
+                    '休憩時間もしくは退勤時間が不適切な値です'
+                );
             }
-        });
-    }
+
+            // 休憩終了 ≤ 開始
+            if ($be->lte($bs)) {
+                $validator->errors()->add(
+                    "breaks.$i.end",
+                    '休憩時間が不適切な値です'
+                );
+            }
+        }
+    });
+}
+
 
     public function messages()
     {

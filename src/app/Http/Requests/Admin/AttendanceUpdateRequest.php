@@ -12,19 +12,16 @@ class AttendanceUpdateRequest extends FormRequest
         return true;
     }
 
-   public function rules(): array
+public function rules(): array
 {
     return [
-        'user_id'    => ['required', 'exists:users,id'],
-        'work_date'  => ['required', 'date'],
-
         'start_time'  => ['required', 'date_format:H:i'],
         'end_time'    => ['required', 'date_format:H:i'],
         'break_start' => ['nullable', 'date_format:H:i'],
         'break_end'   => ['nullable', 'date_format:H:i'],
         'note'        => ['required'],
     ];
-    }
+}
 
     public function messages(): array
     {

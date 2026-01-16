@@ -23,9 +23,12 @@ class AttendanceController extends Controller
         $dateLabel = $w->format('Y年n月j日').'（'.$week[$w->dayOfWeek].'）の勤怠';
 
         $attendances = Attendance::with(['user','breaks'])
-            ->whereDate('work_date', $date)
-            ->get()
-            ->map(function($att){
+    ->whereDate('work_date', $date)
+    ->orderBy('updated_at', 'desc') // ★追加
+    ->get()
+    ->unique('user_id')             // ★追加
+    ->values()
+    ->map(function($att){
 
                 $start = $att->start_time?->format('H:i') ?? 'ー';
                 $end   = $att->end_time?->format('H:i') ?? 'ー';
@@ -103,7 +106,10 @@ class AttendanceController extends Controller
             ]);
         }
 
-        return back()->with('success', '勤怠内容を修正しました');
+     return redirect()
+    ->route('admin.attendance.list')
+    ->with('success', '勤怠内容を修正しました');
+
     }
 
     /**
@@ -180,7 +186,7 @@ class AttendanceController extends Controller
         }
 
         return redirect()
-            ->route('admin.attendance.detail', $attendance->id)
+            ->route('admin.attendance.list', $attendance->id)
             ->with('success', '勤怠を登録しました');
     }
 }

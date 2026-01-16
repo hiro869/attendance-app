@@ -1,0 +1,98 @@
+/* =========================
+   全体背景
+========================= */
+body {
+    margin: 0;
+    background: #efeff3;
+}
+
+/* =========================
+   ページ全体
+========================= */
+.page-wrapper {
+    max-width: 760px;
+    margin: 60px auto;
+}
+
+/* =========================
+   タイトル
+========================= */
+.page-title {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 24px;
+}
+
+.title-bar {
+    width: 6px;
+    height: 26px;
+    background: #000;
+    margin-right: 10px;
+}
+
+/* =========================
+   タブメニュー
+========================= */
+.tab-menu {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #bbb;
+}
+
+.tab-menu a {
+    font-size: 14px;
+    color: #888;
+    text-decoration: none;
+    padding-bottom: 6px;
+}
+
+.tab-menu a.active {
+    color: #000;
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+}
+
+/* =========================
+   テーブル（白カード）
+========================= */
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ヘッダー */
+.list-table thead th {
+    background: #f6f6f6;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+/* 行 */
+.list-table tbody td {
+    padding: 14px 8px;
+    font-size: 14px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+/* =========================
+   詳細リンク
+========================= */
+.list-table a {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.list-table a:hover {
+    text-decoration: underline;
+}

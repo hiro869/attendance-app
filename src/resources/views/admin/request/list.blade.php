@@ -1,4 +1,7 @@
 @extends('layouts.admin')
+@push('page_css')
+<link rel="stylesheet" href="{{ asset('css/request/list.css') }}">
+@endpush
 
 @section('content')
 <div class="page-wrapper">
