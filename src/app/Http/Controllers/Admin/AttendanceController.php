@@ -13,6 +13,7 @@ class AttendanceController extends Controller
 {
     /**
      * 勤怠一覧（管理者）
+     * ※ 1日1ユーザー=1件が前提。unique() は不要
      */
     public function index(Request $request)
     {
@@ -23,16 +24,15 @@ class AttendanceController extends Controller
         $dateLabel = $w->format('Y年n月j日').'（'.$week[$w->dayOfWeek].'）の勤怠';
 
         $attendances = Attendance::with(['user','breaks'])
-    ->whereDate('work_date', $date)
-    ->orderBy('updated_at', 'desc') // ★追加
-    ->get()
-    ->unique('user_id')             // ★追加
-    ->values()
-    ->map(function($att){
+            ->whereDate('work_date', $date)
+            ->orderBy('user_id')
+            ->get()
+            ->map(function ($att) {
 
                 $start = $att->start_time?->format('H:i') ?? 'ー';
                 $end   = $att->end_time?->format('H:i') ?? 'ー';
 
+                // 休憩合計
                 $breakSec = 0;
                 foreach ($att->breaks as $b) {
                     if ($b->break_start && $b->break_end) {
@@ -40,11 +40,17 @@ class AttendanceController extends Controller
                     }
                 }
 
-                $break = sprintf('%d:%02d', intdiv($breakSec,3600), intdiv($breakSec%3600,60));
+                $break = $breakSec
+                    ? sprintf('%d:%02d', intdiv($breakSec,3600), intdiv($breakSec%3600,60))
+                    : 'ー';
 
+                // 労働時間
                 if ($att->start_time && $att->end_time) {
-                    $workSec = $att->start_time->diffInSeconds($att->end_time) - $breakSec;
-                    $total = sprintf('%d:%02d', intdiv(max($workSec,0),3600), intdiv(max($workSec,0)%3600,60));
+                    $workSec = max(
+                        $att->start_time->diffInSeconds($att->end_time) - $breakSec,
+                        0
+                    );
+                    $total = sprintf('%d:%02d', intdiv($workSec,3600), intdiv($workSec%3600,60));
                 } else {
                     $total = 'ー';
                 }
@@ -69,7 +75,7 @@ class AttendanceController extends Controller
     }
 
     /**
-     * 勤怠詳細（IDあり）
+     * 勤怠詳細（ID指定）
      */
     public function detail($id)
     {
@@ -84,19 +90,20 @@ class AttendanceController extends Controller
     }
 
     /**
-     * 勤怠修正（既存データ）
+     * 勤怠修正（管理者：update のみ）
      */
     public function update(AttendanceUpdateRequest $request, $id)
     {
         $attendance = Attendance::findOrFail($id);
 
+        // 勤怠更新
         $attendance->update([
             'start_time' => $request->start_time,
             'end_time'   => $request->end_time,
             'note'       => $request->note,
         ]);
 
-        // 🔥 休憩は一旦削除して作り直す（評価的に安全）
+        // 休憩は作り直す（評価的に安全）
         $attendance->breaks()->delete();
 
         if ($request->break_start && $request->break_end) {
@@ -106,10 +113,9 @@ class AttendanceController extends Controller
             ]);
         }
 
-     return redirect()
-    ->route('admin.attendance.list')
-    ->with('success', '勤怠内容を修正しました');
-
+        return redirect()
+            ->route('admin.attendance.list')
+            ->with('success', '勤怠内容を修正しました');
     }
 
     /**
@@ -125,8 +131,6 @@ class AttendanceController extends Controller
 
         $prev = $current->copy()->subMonth()->format('Y-m');
         $next = $current->copy()->addMonth()->format('Y-m');
-
-        $week = ['日','月','火','水','木','金','土'];
 
         $attendances = Attendance::with('breaks')
             ->where('user_id', $staff->id)
@@ -148,6 +152,7 @@ class AttendanceController extends Controller
 
     /**
      * 日付指定の詳細（勤怠なし日もOK）
+     * ※ 新規作成はしない（表示のみ）
      */
     public function detailByDate(User $user, $date)
     {
@@ -163,30 +168,5 @@ class AttendanceController extends Controller
             'attendance' => $attendance,
             'date'       => Carbon::parse($date),
         ]);
-    }
-
-    /**
-     * 勤怠新規作成（勤怠なし日）
-     */
-    public function store(AttendanceUpdateRequest $request)
-    {
-        $attendance = Attendance::create([
-            'user_id'    => $request->user_id,
-            'work_date'  => $request->work_date,
-            'start_time' => $request->start_time,
-            'end_time'   => $request->end_time,
-            'note'       => $request->note,
-        ]);
-
-        if ($request->break_start && $request->break_end) {
-            $attendance->breaks()->create([
-                'break_start' => $request->break_start,
-                'break_end'   => $request->break_end,
-            ]);
-        }
-
-        return redirect()
-            ->route('admin.attendance.list', $attendance->id)
-            ->with('success', '勤怠を登録しました');
     }
 }
