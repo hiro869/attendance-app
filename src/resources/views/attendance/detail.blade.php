@@ -14,155 +14,148 @@
             <h2>勤怠詳細</h2>
         </div>
 
+        @php
+            $hasAttendance = !is_null($attendance);
+            $editable = $hasAttendance && is_null($correctionRequest);
+            if ($editable) {
+                $breaksForView = collect($breaks ?? [])->push(null);
+            } else {
+                $breaksForView = collect($breaks ?? []);
+            }
+        @endphp
+
         <div class="detail-card">
 
-            @php
-                $hasAttendance = !is_null($attendance);
-                $hasRequest = $hasAttendance && !is_null($correctionRequest);
-            @endphp
+            @if (!$hasAttendance)
 
-            {{-- 修正可能な場合のみ form --}}
-            @if ($hasAttendance && !$hasRequest)
+                <table class="detail-table">
+                    <tr>
+                        <th>名前</th>
+                        <td>{{ auth()->user()->name }}</td>
+                    </tr>
+                    <tr>
+                        <th>日付</th>
+                        <td>{{ \Carbon\Carbon::parse($date)->format('Y年n月j日') }}</td>
+                    </tr>
+                    <tr>
+                        <th>出勤・退勤</th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>備考</th>
+                        <td></td>
+                    </tr>
+                </table>
+
+            @else
+
+                @if ($editable)
                 <form method="POST" action="{{ route('attendance.requestCorrection', $attendance->id) }}">
                     @csrf
-            @endif
-
-            <table class="detail-table">
-
-                {{-- 名前 --}}
-                <tr>
-                    <th>名前</th>
-                    <td>{{ auth()->user()->name }}</td>
-                </tr>
-
-                {{-- 日付 --}}
-                <tr>
-                    <th>日付</th>
-                    <td>
-                        @if ($attendance)
-                            {{ \Carbon\Carbon::parse($attendance->work_date)->format('Y年m月d日') }}
-                        @else
-                            {{ \Carbon\Carbon::parse($date)->format('Y年m月d日') }}
-                        @endif
-                    </td>
-                </tr>
-
-                {{-- 出勤・退勤 --}}
-                <tr>
-                    <th>出勤・退勤</th>
-                    <td class="time-row">
-                        @if ($hasAttendance && !$hasRequest)
-                            <input type="time" name="start_time"
-                                value="{{ old('start_time', $attendance->start_time?->format('H:i')) }}">
-                            〜
-                            <input type="time" name="end_time"
-                                value="{{ old('end_time', $attendance->end_time?->format('H:i')) }}">
-
-                            @error('start_time')
-                                <p class="error-text">{{ $message }}</p>
-                            @enderror
-                            @error('end_time')
-                                <p class="error-text">{{ $message }}</p>
-                            @enderror
-                        @else
-                            {{ $attendance?->start_time?->format('H:i') ?? 'ー' }}
-                            〜
-                            {{ $attendance?->end_time?->format('H:i') ?? 'ー' }}
-                        @endif
-                    </td>
-                </tr>
-
-                {{-- =========================
-                     休憩（回数分）
-                ========================= --}}
-                @foreach ($breaks as $i => $break)
-                <tr>
-                    <th>休憩{{ $i + 1 }}</th>
-                    <td class="time-row">
-                        @if ($hasAttendance && !$hasRequest)
-                            <input type="time" name="breaks[{{ $i }}][start]"
-                                value="{{ old("breaks.$i.start", $break->break_start?->format('H:i')) }}">
-                            〜
-                            <input type="time" name="breaks[{{ $i }}][end]"
-                                value="{{ old("breaks.$i.end", $break->break_end?->format('H:i')) }}">
-
-                            @error("breaks.$i.start")
-                                <p class="error-text">{{ $message }}</p>
-                            @enderror
-                            @error("breaks.$i.end")
-                                <p class="error-text">{{ $message }}</p>
-                            @enderror
-                        @else
-                            {{ $break->break_start?->format('H:i') ?? 'ー' }}
-                            〜
-                            {{ $break->break_end?->format('H:i') ?? 'ー' }}
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-
-                {{-- =========================
-                     休憩（追加用1件）
-                ========================= --}}
-                @if ($hasAttendance && !$hasRequest)
-                <tr>
-                    <th>休憩{{ $breaks->count() + 1 }}</th>
-                    <td class="time-row">
-                        <input type="time" name="breaks[new][start]">
-                        〜
-                        <input type="time" name="breaks[new][end]">
-
-                        @error('breaks.new.start')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
-                        @error('breaks.new.end')
-                            <p class="error-text">{{ $message }}</p>
-                        @enderror
-                    </td>
-                </tr>
                 @endif
 
-                {{-- 備考 --}}
-                <tr>
-                    <th>備考</th>
-                    <td>
-                        @if ($hasAttendance && !$hasRequest)
-                            <input type="text"
-                                name="note"
-                                value="{{ old('note') }}"
-                                placeholder="修正理由を入力してください">
+                <table class="detail-table">
 
-                            @error('note')
-                                <p class="error-text">{{ $message }}</p>
-                            @enderror
-                        @else
-                            {{ $hasRequest ? $correctionRequest->note : ($attendance?->note ?? 'ー') }}
-                        @endif
-                    </td>
-                </tr>
+                    <tr>
+                        <th>名前</th>
+                        <td>{{ auth()->user()->name }}</td>
+                    </tr>
+                    <tr>
+                        <th>日付</th>
+                        <td>{{ $attendance->work_date->format('Y年n月j日') }}</td>
+                    </tr>
 
-            </table>
+                    {{-- 出勤・退勤 --}}
+                    <tr>
+                        <th>出勤・退勤</th>
+                        <td>
+                            @if ($editable)
+                                <div class="time-inputs">
+                                    <input type="time" name="start_time"
+                                        value="{{ old('start_time', optional($attendance->start_time)->format('H:i')) }}">
+                                    <span class="wave">〜</span>
+                                    <input type="time" name="end_time"
+                                        value="{{ old('end_time', optional($attendance->end_time)->format('H:i')) }}">
+                                </div>
+                                @error('start_time') <span class="error-text">{{ $message }}</span> @enderror
+                                @error('end_time') <span class="error-text">{{ $message }}</span> @enderror
+                            @else
+                                <div class="time-display">
+                                    <span>{{ optional($attendance->start_time)->format('H:i') }}</span>
+                                    <span class="wave">〜</span>
+                                    <span>{{ optional($attendance->end_time)->format('H:i') }}</span>
+                                </div>
+                            @endif
+                        </td>
+                    </tr>
 
-            {{-- 修正ボタン --}}
-            @if ($hasAttendance && !$hasRequest)
-                <div class="btn-area">
-                    <button type="submit" class="edit-btn">修正</button>
-                </div>
-                </form>
-            @endif
+                    {{-- 休憩 --}}
+                    @foreach ($breaksForView as $i => $break)
+                    <tr>
+                        <th>休憩{{ $i + 1 }}</th>
+                        <td>
+                            @if ($editable)
+                                <div class="time-inputs">
+                                    <input type="time" name="breaks[{{ $i }}][start]"
+                                        value="{{ optional($break?->break_start)->format('H:i') }}">
+                                    <span class="wave">〜</span>
+                                    <input type="time" name="breaks[{{ $i }}][end]"
+                                        value="{{ optional($break?->break_end)->format('H:i') }}">
+                                </div>
+                                @error("breaks.$i.start") <span class="error-text">{{ $message }}</span> @enderror
+                                @error("breaks.$i.end") <span class="error-text">{{ $message }}</span> @enderror
+                            @else
+                                <div class="time-display">
+                                    <span>{{ optional($break?->break_start)->format('H:i') }}</span>
+                                    <span class="wave">〜</span>
+                                    <span>{{ optional($break?->break_end)->format('H:i') }}</span>
+                                </div>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
 
-            {{-- メッセージ --}}
-            @if (!$hasAttendance)
-                <p class="error-text right">
-                    ※ この日は勤怠データが存在しないため、修正はできません。
-                </p>
-            @elseif ($hasRequest)
-                <p class="error-text right">
-                    ※ 承認待ちのため修正はできません。
-                </p>
-            @endif
+                    {{-- 備考 --}}
+                    <tr>
+                        <th>備考</th>
+                        <td>
+                            @if ($editable)
+                                <textarea name="note" placeholder="修正理由を入力してください">{{ old('note') }}</textarea>
+                                @error('note') <span class="error-text">{{ $message }}</span> @enderror
+                            @else
+                                {{ $attendance->note ?? '' }}
+                            @endif
+                        </td>
+                    </tr>
+
+                </table>
 
         </div>
+
+        {{-- 修正ボタン --}}
+                @if ($editable)
+                    <div class="btn-area">
+                        <button type="submit" class="edit-btn">修正</button>
+                    </div>
+                </form>
+                @endif
+
+            @endif
+        </div>
+
+        {{-- =====================
+           カード外メッセージ（Figma通り）
+        ====================== --}}
+        @if (!$hasAttendance)
+            <p class="error-text">
+                ※ 勤怠データが存在しないため修正できません。
+            </p>
+        @elseif (!$editable)
+            <p class="error-text">
+                ※ 承認待ちのため修正はできません。
+            </p>
+        @endif
+
     </div>
 </div>
 @endsection

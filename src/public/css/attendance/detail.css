@@ -1,129 +1,308 @@
-/* ===== ページ全体 ===== */
+
+
+/* =========================
+
+   ページ全体
+
+========================= */
+
 .detail-page {
+
     background: #f5f5f5;
+
     padding: 60px 20px;
+
     min-height: calc(100vh - 70px);
+
 }
 
-/* ===== 中央寄せ ===== */
+
+
 .detail-wrapper {
+
     max-width: 900px;
+
     margin: 0 auto;
+
 }
 
-/* ===== タイトル ===== */
+
+
+/* =========================
+
+   タイトル
+
+========================= */
+
 .detail-title {
+
     display: flex;
+
     align-items: center;
+
     margin-bottom: 30px;
+
 }
+
+
 
 .title-bar {
+
     width: 4px;
+
     height: 28px;
+
     background: #000;
+
     margin-right: 12px;
+
 }
+
+
 
 .detail-title h2 {
+
     font-size: 22px;
+
     font-weight: 700;
-    margin: 0;
+
 }
 
-/* ===== カード ===== */
+
+
+/* =========================
+
+   カード
+
+========================= */
+
 .detail-card {
+
     background: #fff;
-    border-radius: 10px;
-    padding: 30px;
+
+    border-radius: 12px;
+
+    padding: 40px;
+
 }
 
-/* ===== テーブル ===== */
+
+
+/* =========================
+
+   テーブル
+
+========================= */
+
 .detail-table {
+
     width: 100%;
+
     border-collapse: collapse;
+
 }
+
+
+
+.detail-table tr {
+
+    border-bottom: 1px solid #eee;
+
+}
+
+
 
 .detail-table th {
+
     width: 180px;
+
+    padding: 26px 0;
+
+    font-size: 14px;
+
+    color: #777;
+
     text-align: left;
-    font-weight: 500;
-    color: #666;
-    padding: 18px 0;
-    border-bottom: 1px solid #eee;
-    vertical-align: middle;
+
 }
+
+
 
 .detail-table td {
-    padding: 18px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 16px;
-}
 
-/* ===== 時刻入力 ===== */
-.time-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
+    padding: 26px 0;
 
-/* ===== input ===== */
-input[type="time"],
-input[type="text"] {
-    height: 36px;
-    padding: 0 10px;
     font-size: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: #fff;
+
+    color: #000;
+
 }
 
-/* ===== ボタン ===== */
-.btn-area {
-    text-align: right;
-    margin-top: 30px;
+
+
+/* =========================
+
+   修正画面（input）
+
+========================= */
+
+.time-inputs {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 24px;
+
 }
+
+
+
+.time-inputs input[type="time"] {
+
+    width: 120px;
+
+    padding: 10px 12px;
+
+    font-size: 14px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+}
+
+
+
+/* 時計アイコン削除 */
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+
+    display: none;
+
+}
+
+
+
+/* =========================
+
+   備考
+
+========================= */
+
+.detail-table textarea {
+
+    width: 330px;
+
+    height: 64px;
+
+    padding: 10px;
+
+    font-size: 14px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 6px;
+
+    resize: none;
+
+}
+
+
+
+/* =========================
+
+   エラーメッセージ
+
+========================= */
+
+.error-text {
+
+    color: red;
+
+    font-size: 13px;
+
+    margin-top: 16px;
+
+    text-align: right;  /* メッセージ中央揃え */
+
+    width: 100%;          /* カード外に収める */
+
+    max-width: 900px;     /* detail-wrapperと同じ幅 */
+
+    margin: 20px auto;    /* 上と下に適度な余白 */
+
+    padding: 0 40px;      /* カードのpaddingと合わせる */
+
+}
+
+
+
+/* =========================
+
+   修正ボタン
+
+========================= */
+
+.btn-area {
+
+    text-align: right;   /* ボタンを中央に配置 */
+
+    margin-top: 30px;     /* 少し余白を追加 */
+
+}
+
+
 
 .edit-btn {
+
     background: #000;
+
     color: #fff;
+
+    padding: 12px 40px;
+
+    font-size: 14px;
+
     border: none;
-    padding: 12px 36px;
-    font-size: 16px;
+
     border-radius: 6px;
+
     cursor: pointer;
+
 }
 
-/* 承認済み（小バッジ） */
-.approved {
-    display: inline-block;
-    background: #7f7f7f;
-    color: #fff;
+.detail-table tr:last-child {
 
-    padding: 8px 20px;
-    border-radius: 6px;
+    border-bottom: none;
 
-    font-size: 14px;
-    font-weight: 500;
-
-    margin-top: 30px;
 }
-
-
-.edit-btn:hover {
-    opacity: 0.85;
-}
-
-/* ===== エラーメッセージ ===== */
+/* エラーメッセージ全体のスタイル */
 .error-text {
-    color: #e60000;
-    font-size: 14px;
-    margin-left: 12px;
+    color: red;               /* エラーメッセージを赤色に */
+    font-size: 0.875rem;      /* メッセージのフォントサイズ */
+    font-weight: bold;        /* 太字にして強調 */
+    margin-top: 0.25rem;      /* フォームフィールドとの間に少しスペース */
+    margin-bottom: 0.5rem;    /* メッセージの下にスペース */
 }
 
-/* ===== 承認待ちメッセージ ===== */
-.error-text.right {
-    text-align: right;
-    margin-top: 30px;
+/* 入力フィールドのエラーメッセージのスタイル */
+.time-inputs input, textarea {
+    border-color: #ccc;       /* 通常状態の枠線 */
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.time-inputs input:focus, textarea:focus {
+    outline: none;            /* フォーカス時にアウトラインなし */
+    border-color: #289ADC;    /* フォーカス時に青色に */
+}
+
+.time-inputs input.error, textarea.error {
+    border-color: red;        /* エラー時に赤色の枠線 */
+}
+
+/* メッセージの下にスペースを追加 */
+form {
+    padding-bottom: 1rem;
 }

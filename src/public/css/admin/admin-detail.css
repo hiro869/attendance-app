@@ -1,0 +1,170 @@
+/* =========================
+   ページ全体
+========================= */
+.attendance-detail-page {
+    background: #f5f5f5;
+    padding: 60px 20px;
+    min-height: calc(100vh - 70px);
+}
+
+.attendance-detail-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* =========================
+   タイトル
+========================= */
+.attendance-detail-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.title-bar {
+    width: 4px;
+    height: 28px;
+    background: #000;
+    margin-right: 12px;
+}
+
+.attendance-detail-title h2 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* =========================
+   カード
+========================= */
+.attendance-detail-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+/* =========================
+   テーブル
+========================= */
+.attendance-detail-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.attendance-detail-table tr {
+    border-bottom: 1px solid #eee;
+}
+
+.attendance-detail-table th {
+    width: 180px;
+    padding: 16px 0;
+    font-size: 14px;
+    color: #777;
+    text-align: left;
+}
+
+.attendance-detail-table td {
+    padding: 16px 0;
+    font-size: 15px;
+    color: #000;
+}
+
+/* =========================
+   修正画面（input）
+========================= */
+.time-inputs {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+.attendance-time-row input[type="time"] {
+    width: 125px;  /* 入力欄の幅を調整 */
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+
+.time-inputs input[type="time"] {
+    width: 500px; /* 少し広く調整 */
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 20px;
+}
+/* 時計アイコン削除 */
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+
+    display: none;
+
+}
+
+
+/* =========================
+   備考
+========================= */
+.attendance-detail-card input[type="text"] {
+    width: 100%;
+    max-width: 300px; /* 半分の幅に調整 */
+    height: 50px;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* =========================
+   修正ボタン
+========================= */
+.attendance-btn-area {
+    text-align: right;
+    margin-top: 30px;
+}
+
+.attendance-edit-btn {
+    background: #000;
+    color: #fff;
+    padding: 12px 40px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.attendance-detail-table tr:last-child {
+    border-bottom: none;
+}
+
+/* =========================
+   エラーメッセージ
+========================= */
+/* エラーメッセージのスタイル */
+.error-text {
+    color: #e60023; /* 赤色で目立たせる */
+    font-size: 14px; /* フォントサイズを少し小さめに */
+    font-weight: bold; /* 太字にして強調 */
+    margin-top: 5px; /* メッセージとの間に少しスペースを */
+    margin-bottom: 10px; /* メッセージ下に余白を */
+    display: block; /* ブロック表示にして下にスペースを作成 */
+}
+
+/* 入力フィールドのフォーカス時にエラーメッセージを強調 */
+input[type="time"]:invalid {
+    border: 2px solid #e60023; /* 赤い枠線を追加 */
+    background-color: #fff0f0; /* 背景色を少し赤に */
+}
+
+/* バリデーションエラーの時の入力欄 */
+input[type="time"]:invalid:focus {
+    outline: none; /* デフォルトの青枠を消す */
+    box-shadow: 0 0 10px rgba(230, 0, 35, 0.6); /* 赤い影を追加して目立たせる */
+}
+
+/* フォーム内のエラーメッセージを囲う枠線 */
+.form-group {
+    margin-bottom: 15px; /* 各フォームの間に余白を */
+}
+

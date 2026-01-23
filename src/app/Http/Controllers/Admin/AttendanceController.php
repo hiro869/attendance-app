@@ -93,30 +93,35 @@ class AttendanceController extends Controller
      * 勤怠修正（管理者：update のみ）
      */
     public function update(AttendanceUpdateRequest $request, $id)
-    {
-        $attendance = Attendance::findOrFail($id);
+{
+    $attendance = Attendance::findOrFail($id);
 
-        // 勤怠更新
-        $attendance->update([
-            'start_time' => $request->start_time,
-            'end_time'   => $request->end_time,
-            'note'       => $request->note,
-        ]);
+    // 勤怠更新
+    $attendance->update([
+        'start_time' => $request->start_time,
+        'end_time'   => $request->end_time,
+        'note'       => $request->note,
+    ]);
 
-        // 休憩は作り直す（評価的に安全）
-        $attendance->breaks()->delete();
+    // 既存休憩を全削除
+    $attendance->breaks()->delete();
 
-        if ($request->break_start && $request->break_end) {
-            $attendance->breaks()->create([
-                'break_start' => $request->break_start,
-                'break_end'   => $request->break_end,
-            ]);
+    // 休憩を配列で再作成
+    foreach ($request->breaks ?? [] as $break) {
+        if (empty($break['start']) || empty($break['end'])) {
+            continue;
         }
 
-        return redirect()
-            ->route('admin.attendance.list')
-            ->with('success', '勤怠内容を修正しました');
+        $attendance->breaks()->create([
+            'break_start' => $break['start'],
+            'break_end'   => $break['end'],
+        ]);
     }
+
+    return redirect()
+        ->route('admin.attendance.list')
+        ->with('success', '勤怠内容を修正しました');
+}
 
     /**
      * スタッフ月次勤怠

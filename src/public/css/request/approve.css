@@ -1,0 +1,119 @@
+.detail-page {
+    background: #f2f2f2;
+    padding: 60px 20px;
+}
+
+.detail-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* タイトル */
+.detail-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title-bar {
+    width: 4px;
+    height: 26px;
+    background: #000;
+    margin-right: 10px;
+}
+
+/* カード */
+.detail-card {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 6px;
+}
+
+/* テーブル */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.detail-table tr {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.detail-table th {
+    width: 180px;
+    padding: 18px 0;
+    color: #666;
+    text-align: left;
+}
+
+.detail-table td {
+    padding: 18px 0;
+}
+
+/* 日付 */
+.date-row {
+    display: flex;
+    gap: 32px;
+}
+
+/* 時間 */
+.time-row {
+    display: flex;
+    gap: 24px;
+}
+
+/* ボタンエリア（グレーなし） */
+.action-area {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* 承認 */
+.approve-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 10px 32px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 承認済み */
+.approved-btn {
+    background: #9e9e9e;
+    color: #fff;
+    padding: 10px 32px;
+    border-radius: 6px;
+}
+/* 承認・承認済み 共通サイズ */
+.approve-btn,
+.approved-btn {
+    width: 120px;          /* ←同じ幅 */
+    height: 44px;          /* ←同じ高さ */
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 承認 */
+.approve-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+}
+
+/* 承認済み */
+.approved-btn {
+    background: #9e9e9e;
+    color: #fff;
+    border: none;
+}
+/* 最後の行（備考）の下線を消す */
+.detail-table tr:last-child {
+    border-bottom: none;
+}
