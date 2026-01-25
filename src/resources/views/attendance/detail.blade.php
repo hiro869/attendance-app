@@ -17,6 +17,7 @@
         @php
             $hasAttendance = !is_null($attendance);
             $editable = $hasAttendance && is_null($correctionRequest);
+
             if ($editable) {
                 $breaksForView = collect($breaks ?? [])->push(null);
             } else {
@@ -24,10 +25,10 @@
             }
         @endphp
 
-        <div class="detail-card">
+        {{-- 勤怠データなし --}}
+        @if (!$hasAttendance)
 
-            @if (!$hasAttendance)
-
+            <div class="detail-card">
                 <table class="detail-table">
                     <tr>
                         <th>名前</th>
@@ -46,20 +47,31 @@
                         <td></td>
                     </tr>
                 </table>
+            </div>
 
-            @else
+            <p class="error-text">
+                ※ 勤怠データが存在しないため修正できません。
+            </p>
 
-                @if ($editable)
-                <form method="POST" action="{{ route('attendance.requestCorrection', $attendance->id) }}">
-                    @csrf
-                @endif
+        @else
+
+            {{-- 修正可能時のみ form --}}
+            @if ($editable)
+            <form method="POST" action="{{ route('attendance.requestCorrection', $attendance->id) }}">
+                @csrf
+            @endif
+
+            <div class="detail-card">
 
                 <table class="detail-table">
 
+                    {{-- 名前 --}}
                     <tr>
                         <th>名前</th>
                         <td>{{ auth()->user()->name }}</td>
                     </tr>
+
+                    {{-- 日付 --}}
                     <tr>
                         <th>日付</th>
                         <td>{{ $attendance->work_date->format('Y年n月j日') }}</td>
@@ -97,10 +109,10 @@
                             @if ($editable)
                                 <div class="time-inputs">
                                     <input type="time" name="breaks[{{ $i }}][start]"
-                                        value="{{ optional($break?->break_start)->format('H:i') }}">
+                                        value="{{ old("breaks.$i.start", optional($break?->break_start)->format('H:i')) }}">
                                     <span class="wave">〜</span>
                                     <input type="time" name="breaks[{{ $i }}][end]"
-                                        value="{{ optional($break?->break_end)->format('H:i') }}">
+                                        value="{{ old("breaks.$i.end", optional($break?->break_end)->format('H:i')) }}">
                                 </div>
                                 @error("breaks.$i.start") <span class="error-text">{{ $message }}</span> @enderror
                                 @error("breaks.$i.end") <span class="error-text">{{ $message }}</span> @enderror
@@ -130,30 +142,26 @@
 
                 </table>
 
-        </div>
-
-        {{-- 修正ボタン --}}
+                {{-- 修正ボタン（カード内） --}}
                 @if ($editable)
                     <div class="btn-area">
                         <button type="submit" class="edit-btn">修正</button>
                     </div>
-                </form>
                 @endif
 
-            @endif
-        </div>
+            </div>
 
-        {{-- =====================
-           カード外メッセージ（Figma通り）
-        ====================== --}}
-        @if (!$hasAttendance)
-            <p class="error-text">
-                ※ 勤怠データが存在しないため修正できません。
-            </p>
-        @elseif (!$editable)
-            <p class="error-text">
-                ※ 承認待ちのため修正はできません。
-            </p>
+            @if ($editable)
+            </form>
+            @endif
+
+            {{-- 承認待ち --}}
+            @if (!$editable)
+                <p class="error-text">
+                    ※ 承認待ちのため修正はできません。
+                </p>
+            @endif
+
         @endif
 
     </div>

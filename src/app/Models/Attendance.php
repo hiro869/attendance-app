@@ -21,6 +21,8 @@ class Attendance extends Model
     'start_time' => 'datetime',
     'end_time'   => 'datetime',
     'work_date'  => 'date',
+    'status' => 'integer',
+
 ];
 
 

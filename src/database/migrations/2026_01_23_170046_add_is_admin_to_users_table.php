@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->text('note')->nullable()->after('end_time');
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_admin')->default(false); // is_adminカラムを追加
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('attendances', function (Blueprint $table) {
-            $table->dropColumn('note');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_admin'); // ロールバック時にカラムを削除
         });
     }
 };

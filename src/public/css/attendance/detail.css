@@ -302,7 +302,3 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     border-color: red;        /* エラー時に赤色の枠線 */
 }
 
-/* メッセージの下にスペースを追加 */
-form {
-    padding-bottom: 1rem;
-}

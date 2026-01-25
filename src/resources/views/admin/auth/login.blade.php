@@ -10,7 +10,7 @@
 
     <form method="POST" action="{{ route('login') }}" class="admin-login-form">
         @csrf
-
+        <input type="hidden" name="login_type" value="admin">
         {{-- メールアドレス --}}
         <div class="form-group">
             <label for="email">メールアドレス</label>

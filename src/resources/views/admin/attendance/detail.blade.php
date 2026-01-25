@@ -18,7 +18,9 @@
 
             @php
                 $hasAttendance = !is_null($attendance);
-                $hasRequest = $hasAttendance ? $attendance->correctionRequests()->where('status', 0)->exists() : false;
+                $hasRequest = $hasAttendance
+                    ? $attendance->correctionRequests()->where('status', 0)->exists()
+                    : false;
                 $breaks = $hasAttendance ? $attendance->breaks : collect();
             @endphp
 
@@ -56,9 +58,11 @@
                             @error('start_time') <span class="error-text">{{ $message }}</span> @enderror
                             @error('end_time')   <span class="error-text">{{ $message }}</span> @enderror
                         @else
-                            {{ $attendance?->start_time?->format('H:i') ?? 'ー' }}
-                            〜
-                            {{ $attendance?->end_time?->format('H:i') ?? 'ー' }}
+                            @if ($attendance?->start_time && $attendance?->end_time)
+                                {{ $attendance->start_time->format('H:i') }}
+                                〜
+                                {{ $attendance->end_time->format('H:i') }}
+                            @endif
                         @endif
                     </td>
                 </tr>
@@ -78,9 +82,11 @@
                                 @error("breaks.$i.start") <span class="error-text">{{ $message }}</span> @enderror
                                 @error("breaks.$i.end")   <span class="error-text">{{ $message }}</span> @enderror
                             @else
-                                {{ $break->break_start?->format('H:i') ?? 'ー' }}
-                                〜
-                                {{ $break->break_end?->format('H:i') ?? 'ー' }}
+                                @if ($break->break_start && $break->break_end)
+                                    {{ $break->break_start->format('H:i') }}
+                                    〜
+                                    {{ $break->break_end->format('H:i') }}
+                                @endif
                             @endif
                         </td>
                     </tr>
@@ -115,10 +121,9 @@
                                    name="note"
                                    value="{{ old('note', $attendance->note) }}"
                                    placeholder="修正理由を入力してください">
-
                             @error('note') <span class="error-text">{{ $message }}</span> @enderror
                         @else
-                            {{ $attendance?->note ?? 'ー' }}
+                            {{ $attendance?->note ?? '' }}
                         @endif
                     </td>
                 </tr>
@@ -126,23 +131,24 @@
         </div>
 
         {{-- 修正ボタン --}}
-            @if ($hasAttendance && !$hasRequest)
-                <div class="attendance-btn-area">
-                    <button type="submit" class="attendance-edit-btn">修正</button>
-                </div>
-                </form>
-            @endif
+        @if ($hasAttendance && !$hasRequest)
+            <div class="attendance-btn-area">
+                <button type="submit" class="attendance-edit-btn">修正</button>
+            </div>
+            </form>
+        @endif
 
-            {{-- メッセージ --}}
-            @if (!$hasAttendance)
-                <p class="error-text">
-                    ※ この日は勤怠データが存在しないため、修正はできません。
-                </p>
-            @elseif ($hasRequest)
-                <p class="error-text">
-                    ※ 承認待ちのため修正はできません。
-                </p>
-            @endif
+        {{-- メッセージ --}}
+        @if (!$hasAttendance)
+            <p class="error-text right-message">
+                ※ この日は勤怠データが存在しないため、修正はできません。
+            </p>
+        @elseif ($hasRequest)
+            <p class="error-text right-message">
+                ※ 承認待ちのため修正はできません。
+            </p>
+        @endif
+
     </div>
 </div>
 @endsection

@@ -9,20 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::table('attendances', function (Blueprint $table) {
-            $table->text('note')->nullable()->after('end_time');
+            // status カラムを文字列型に変更
+            $table->string('status')->change();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::table('attendances', function (Blueprint $table) {
-            $table->dropColumn('note');
+            // もしマイグレーションをロールバックする場合は整数型に戻す
+            $table->integer('status')->change();
         });
     }
 };

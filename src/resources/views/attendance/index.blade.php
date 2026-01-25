@@ -4,10 +4,11 @@
 @endpush
 
 @section('content')
+
 <div class="attendance-wrapper">
 
     <p class="status">
-        @if (!$attendance)
+        @if (!$attendance || $attendance->status === 0)
             勤務外
         @elseif ($attendance->status === 1)
             出勤中

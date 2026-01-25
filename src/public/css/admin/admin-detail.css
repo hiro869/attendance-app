@@ -167,4 +167,13 @@ input[type="time"]:invalid:focus {
 .form-group {
     margin-bottom: 15px; /* 各フォームの間に余白を */
 }
+/* =========================
+   カード外メッセージ（右寄せ）
+========================= */
+.right-message {
+    text-align: right;      /* 右寄せ */
+    max-width: 900px;       /* カード幅と合わせる */
+    margin: 20px auto 0;    /* 上に余白、左右中央 */
+    padding-right: 40px;   /* カードのpaddingと揃える */
+}
 

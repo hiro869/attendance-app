@@ -49,15 +49,30 @@ class FortifyServiceProvider extends ServiceProvider
             }
         });
 
-        $this->app->instance(LoginResponse::class, new class implements LoginResponse {
-            public function toResponse($request)
-            {
-            if (auth()->user()->role === 'admin') {
-                return redirect()->route('admin.attendance.list');
-            }
-                return redirect()->route('attendance.index');
-            }
-        });
+ $this->app->instance(LoginResponse::class, new class implements LoginResponse {
+    public function toResponse($request)
+    {
+        $user = auth()->user();
+
+        // ★ 管理者ログインとして送られてきた
+        if ($request->input('login_type') === 'admin' && $user->role !== 'admin') {
+            auth()->logout();
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => ['ログイン情報が登録されていません'],
+            ]);
+        }
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.attendance.list');
+        }
+
+        return redirect()->route('attendance.index');
+    }
+});
+
+
+
 
         /*--------------------------------------------
         | ログイン画面（一般 / 管理者切り替え）
@@ -81,11 +96,8 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
 
-        Fortify::authenticateUsing(function (Request $request) {
+     Fortify::authenticateUsing(function (Request $request) {
 
-    // =========================
-    // ① FormRequest を切り替える
-    // =========================
     if ($request->is('admin/*')) {
         $formRequest = new AdminLoginRequest();
     } else {
@@ -100,14 +112,8 @@ class FortifyServiceProvider extends ServiceProvider
 
     $validated = $formRequest->validated();
 
-    // =========================
-    // ② ユーザー取得
-    // =========================
     $user = \App\Models\User::where('email', $validated['email'])->first();
 
-    // =========================
-    // ③ 認証失敗（要件 FN016）
-    // =========================
     if (
         !$user ||
         !Hash::check($validated['password'], $user->password)
@@ -117,18 +123,9 @@ class FortifyServiceProvider extends ServiceProvider
         ]);
     }
 
-    // =========================
-    // ④ 管理者チェック（超重要）
-    // =========================
-    if ($request->is('admin/*') && $user->role !== 'admin') {
-        throw ValidationException::withMessages([
-            'email' => ['ログイン情報が登録されていません'],
-        ]);
-    }
-
+    // ★ role 判定はここではしない
     return $user;
 });
-
 
         /*--------------------------------------------
         | レートリミット
