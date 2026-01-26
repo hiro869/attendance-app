@@ -17,21 +17,11 @@ docker compose exec app bash
 
 composer install
 
+## .env ファイル作成・DB設定（⚠️先に行う）
+
 cp .env.example .env
 
-php artisan key:generate
-
-php artisan migrate --seed
-
-## テスト実行方法
-
-以下のコマンドで PHPUnit のテストを実行できます。
-
-php artisan test
-
-## 📄 .env 設定について
-
-本アプリは Docker 環境上の MySQL を使用しています。
+.env を以下のように設定してください。
 
 DB_CONNECTION=mysql
 
@@ -45,13 +35,41 @@ DB_USERNAME=laravel
 
 DB_PASSWORD=laravel
 
+SESSION_DRIVER=database
+
 MAIL_MAILER=smtp
 
 MAIL_HOST=mailhog
 
 MAIL_PORT=1025
 
+## アプリケーションキー生成
 
+php artisan key:generate
+
+## マイグレーション & シーディング
+
+php artisan migrate --seed
+
+## セッションテーブル作成
+php artisan session:table
+
+php artisan migrate
+
+※ この手順を実行しない場合、
+/login アクセス時に
+「sessions テーブルが存在しません」エラーが発生します。
+
+## キャッシュクリア
+
+php artisan optimize:clear
+
+
+## テスト実行方法
+
+以下のコマンドで PHPUnit のテストを実行できます。
+
+php artisan test
 
 ## テスト用ログイン情報
 
