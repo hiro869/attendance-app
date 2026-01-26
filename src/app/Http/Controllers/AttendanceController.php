@@ -112,20 +112,24 @@ class AttendanceController extends Controller
      * 打刻処理
      */
     public function store(Request $request)
-    {
-        $user   = Auth::user();
-        $today  = Carbon::today()->toDateString();
-        $action = $request->input('action');
+{
+    $user   = Auth::user();
+    $action = $request->input('action');
 
-        $attendance = Attendance::firstOrCreate(
-            [
-                'user_id'   => $user->id,
-                'work_date' => $today,
-            ],
-            [
-                'status' => 0,
-            ]
-        );
+    $attendance = Attendance::where('user_id', $user->id)
+        ->whereDate('work_date', Carbon::today())
+        ->first();
+
+    if (!$attendance) {
+        $attendance = Attendance::create([
+            'user_id'   => $user->id,
+            'work_date' => Carbon::today(),
+            'status'    => 0,
+        ]);
+    }
+
+    // ↓ 以下は今のまま
+
 
         // 出勤
         if ($action === 'start') {

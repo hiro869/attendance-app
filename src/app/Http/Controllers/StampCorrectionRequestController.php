@@ -13,8 +13,11 @@ class StampCorrectionRequestController extends Controller
 {
     $tab = $request->query('tab', 'pending');
 
-    $query = AttendanceCorrectionRequest::with(['user', 'attendance'])
-        ->where('user_id', auth()->id());
+    $query = AttendanceCorrectionRequest::with(['user', 'attendance']);
+
+    if (!auth()->user()->is_admin) {
+        $query->where('user_id', auth()->id());
+    }
 
     if ($tab === 'pending') {
         $query->where('status', 0)
