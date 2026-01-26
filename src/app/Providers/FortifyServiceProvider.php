@@ -128,7 +128,7 @@ class FortifyServiceProvider extends ServiceProvider
 // 管理者ログインなのに admin じゃない
 if ($isAdminLogin && $user->role !== 'admin') {
     throw ValidationException::withMessages([
-        'email' => ['管理者アカウントではありません'],
+        'email' => ['このアカウントではログインできません'],
     ]);
 }
 
