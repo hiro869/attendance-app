@@ -123,8 +123,24 @@ class FortifyServiceProvider extends ServiceProvider
         ]);
     }
 
-    // ★ role 判定はここではしない
-    return $user;
+ $isAdminLogin = $request->input('login_type') === 'admin';
+
+// 管理者ログインなのに admin じゃない
+if ($isAdminLogin && $user->role !== 'admin') {
+    throw ValidationException::withMessages([
+        'email' => ['管理者アカウントではありません'],
+    ]);
+}
+
+// 一般ログインなのに admin
+if (! $isAdminLogin && $user->role === 'admin') {
+    throw ValidationException::withMessages([
+        'email' => ['このアカウントではログインできません'],
+    ]);
+}
+
+return $user;
+
 });
 
         /*--------------------------------------------
