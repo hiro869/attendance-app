@@ -33,8 +33,6 @@ php artisan test
 
 本アプリは Docker 環境上の MySQL を使用しています。
 
-```env
-
 DB_CONNECTION=mysql
 
 DB_HOST=mysql
