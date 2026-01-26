@@ -43,47 +43,40 @@
                 </thead>
 
                 <tbody>
-                @forelse ($requests as $req)
-                    <tr>
-                        {{-- 状態 --}}
-                        <td>{{ $req->status === 0 ? '承認待ち' : '承認済み' }}</td>
+                    @foreach ($requests as $req)
+                        <tr>
+                            {{-- 状態 --}}
+                            <td>{{ $req->status === 0 ? '承認待ち' : '承認済み' }}</td>
 
-                        {{-- 名前 --}}
-                        <td>{{ $req->user->name }}</td>
+                            {{-- 名前 --}}
+                            <td>{{ $req->user->name }}</td>
 
-                        {{-- 対象日 --}}
-                        <td>
-                            {{ optional($req->attendance)->work_date?->format('Y/m/d') ?? '—' }}
-                        </td>
+                            {{-- 対象日 --}}
+                            <td>
+                                {{ optional($req->attendance)->work_date?->format('Y/m/d') ?? '—' }}
+                            </td>
 
-                        {{-- 申請理由 --}}
-                        <td>{{ $req->note }}</td>
+                            {{-- 申請理由 --}}
+                            <td>{{ $req->note }}</td>
 
-                        {{-- 申請日時 / 承認日時 --}}
-                        <td>
-                            {{ $req->status === 0
-                                ? $req->created_at->format('Y/m/d')
-                                : $req->updated_at->format('Y/m/d') }}
-                        </td>
+                            {{-- 申請日時 / 承認日時 --}}
+                            <td>
+                                {{ $req->status === 0
+                                    ? $req->created_at->format('Y/m/d')
+                                    : $req->updated_at->format('Y/m/d') }}
+                            </td>
 
-                        {{-- 詳細 --}}
-                        <td>
-                            <a class="detail-link"
-                               href="{{ route('attendance.detail', $req->attendance_id) }}">
-                                詳細
-                            </a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="empty">
-                            {{ $tab === 'pending'
-                                ? '承認待ちはありません'
-                                : '承認済みはありません' }}
-                        </td>
-                    </tr>
-                @endforelse
+                            {{-- 詳細 --}}
+                            <td>
+                                <a class="detail-link"
+                                   href="{{ route('attendance.detail', $req->attendance_id) }}">
+                                    詳細
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
+
             </table>
         </div>
 
